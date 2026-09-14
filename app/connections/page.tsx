@@ -60,6 +60,26 @@ function firstOptionForGroup(options: ConnectorOption[], group: ConnectionTypeGr
   return options.find((option) => optionMatchesGroup(option, group));
 }
 
+function usedConnectorOptionIds(connections: ConnectionRow[], personId: string | null) {
+  if (!personId) return new Set<string>();
+
+  return new Set(
+    connections
+      .filter(({ connector }) => connector.ownerPersonId === personId)
+      .map(({ connector }) => connector.connectorOptionId)
+  );
+}
+
+function connectableOptionsForPerson(
+  options: ConnectorOption[],
+  connections: ConnectionRow[],
+  personId: string | null,
+  group: ConnectionTypeGroup
+) {
+  const unavailableOptionIds = usedConnectorOptionIds(connections, personId);
+  return options.filter((option) => optionMatchesGroup(option, group) && !unavailableOptionIds.has(option.id));
+}
+
 export default function ConnectionsPage() {
   const pendingConnectorCounter = useRef(0);
   const [members, setMembers] = useState<Person[]>([]);
@@ -72,10 +92,13 @@ export default function ConnectionsPage() {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [startingConnection, setStartingConnection] = useState(false);
 
-  const filteredOptions = availableConnectors.filter((option) =>
-    optionMatchesGroup(option, selectedConnectionGroup)
+  const connectableOptions = connectableOptionsForPerson(
+    availableConnectors,
+    connections,
+    selectedPersonId,
+    selectedConnectionGroup
   );
-  const selectedOption = filteredOptions.find((option) => option.id === selectedOptionId) ?? null;
+  const selectedOption = connectableOptions.find((option) => option.id === selectedOptionId) ?? null;
 
   useEffect(() => {
     let cancelled = false;
@@ -110,7 +133,13 @@ export default function ConnectionsPage() {
 
   function openConnectDialog(personId?: string) {
     const nextPersonId = personId ?? selectedPersonId ?? members[0]?.id ?? null;
-    const nextOption = selectedOption ?? firstOptionForGroup(availableConnectors, selectedConnectionGroup) ?? null;
+    const nextConnectableOptions = connectableOptionsForPerson(
+      availableConnectors,
+      connections,
+      nextPersonId,
+      selectedConnectionGroup
+    );
+    const nextOption = nextConnectableOptions.find((option) => option.id === selectedOptionId) ?? nextConnectableOptions[0] ?? null;
 
     setSelectedPersonId(nextPersonId);
     if (nextOption) {
@@ -125,7 +154,15 @@ export default function ConnectionsPage() {
 
   function selectConnectionGroup(group: ConnectionTypeGroup) {
     setSelectedConnectionGroup(group);
-    setSelectedOptionId(firstOptionForGroup(availableConnectors, group)?.id ?? null);
+    setSelectedOptionId(firstOptionForGroup(connectableOptions, group)?.id ?? null);
+  }
+
+  function selectPerson(personId: string) {
+    const nextOption =
+      connectableOptionsForPerson(availableConnectors, connections, personId, selectedConnectionGroup)[0] ?? null;
+
+    setSelectedPersonId(personId);
+    setSelectedOptionId(nextOption?.id ?? null);
   }
 
   async function handleStartConnection() {
@@ -282,7 +319,7 @@ export default function ConnectionsPage() {
               id="connection-owner"
               className="input"
               value={selectedPersonId ?? ""}
-              onChange={(event) => setSelectedPersonId(event.target.value)}
+              onChange={(event) => selectPerson(event.target.value)}
             >
               {members.map((member) => (
                 <option key={member.id} value={member.id}>
@@ -302,9 +339,9 @@ export default function ConnectionsPage() {
           </Field>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-            {filteredOptions.length === 0 ? (
-              <CardBody>No demo connectors are available for this type yet.</CardBody>
-            ) : filteredOptions.map((option) => {
+            {connectableOptions.length === 0 ? (
+              <CardBody>No new demo connectors are available for this person and type.</CardBody>
+            ) : connectableOptions.map((option) => {
               const selected = option.id === selectedOption?.id;
               return (
                 <Button
