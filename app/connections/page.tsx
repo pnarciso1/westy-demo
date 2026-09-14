@@ -30,6 +30,22 @@ const CONNECTION_TYPE_GROUPS: { value: ConnectionTypeGroup; label: string }[] = 
   { value: "hsa_fsa_card", label: "HSA/FSA" },
 ];
 
+const CONNECTOR_TYPE_LABELS: Record<Connector["type"], string> = {
+  payer: "Payer",
+  hsa_fsa_card: "HSA/FSA",
+  provider_portal: "Provider",
+  phr_ehr: "Provider",
+};
+
+const MEMBER_LABELS: Record<NonNullable<Person["relationshipToCoordinator"]>, string> = {
+  self: "Me",
+  spouse: "Spouse",
+  child: "Child",
+  parent: "Parent",
+  dependent: "Dependent",
+  other: "Other",
+};
+
 interface ConnectionRow {
   connector: Connector;
   owner: Person;
@@ -43,15 +59,18 @@ function statusVariant(status: Connector["status"]) {
 }
 
 function connectorLabel(type: Connector["type"]) {
-  return type
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
+  return CONNECTOR_TYPE_LABELS[type];
 }
 
 function statusLabel(status: Connector["status"]) {
   if (status === "pending") return "Connecting";
   return status;
+}
+
+function memberLabel(person: Person) {
+  return person.relationshipToCoordinator
+    ? MEMBER_LABELS[person.relationshipToCoordinator]
+    : "Household member";
 }
 
 function optionMatchesGroup(option: ConnectorOption, group: ConnectionTypeGroup) {
@@ -157,11 +176,18 @@ function ExistingConnections({
   return (
     <section>
       <SectionLabel>Existing connections</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-        {connections.map((row) => (
-          <ConnectionCard key={row.connector.id} row={row} onManage={onManage} />
-        ))}
-      </div>
+      {connections.length === 0 ? (
+        <Card>
+          <CardTitle>No connections yet</CardTitle>
+          <CardBody>Start by connecting a payer, provider, or HSA/FSA account for someone in the household.</CardBody>
+        </Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          {connections.map((row) => (
+            <ConnectionCard key={row.connector.id} row={row} onManage={onManage} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -177,20 +203,20 @@ function HouseholdConnectionCards({
 }) {
   return (
     <section>
-      <SectionLabel>Available next connections</SectionLabel>
+      <SectionLabel>Connect household data</SectionLabel>
       <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
         {members.map((member) => {
           const hasConnection = connections.some(({ owner }) => owner.id === member.id);
           return (
             <Card key={member.id} style={{ minWidth: 220 }}>
-              <CardKicker>{member.relationshipToCoordinator ?? "member"}</CardKicker>
+              <CardKicker>{memberLabel(member)}</CardKicker>
               <CardTitle>
                 {member.firstName} {member.lastName}
               </CardTitle>
               <CardBody>
                 {hasConnection
-                  ? "Add another payer or provider portal for this household member."
-                  : "No active data connection yet."}
+                  ? "Add another payer, provider, or HSA/FSA account."
+                  : "Connect a payer, provider, or HSA/FSA account."}
               </CardBody>
               <div>
                 <Button variant={hasConnection ? "secondary" : "primary"} onClick={() => onConnect(member.id)}>
