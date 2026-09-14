@@ -9,10 +9,11 @@ import type {
   Anomaly,
   Document as WestyDocument,
   CareTeamMember,
-  Connector,
   ChatThread,
   Task,
 } from "@westy/shared";
+// TODO: Replace with `import type { Connector, ConnectorOption } from "@westy/shared"` once both interfaces are added there.
+import type { Connector, ConnectorOption } from "@/lib/demo/connectorTypes";
 
 /**
  * The demo's single persona: the Ramirez household. Chosen to show depth
@@ -299,6 +300,7 @@ export const SEED_CARE_TEAM: CareTeamMember[] = [
 export const SEED_CONNECTORS: Connector[] = [
   {
     id: "connector-maria-payer",
+    connectorOptionId: "riverside-health-plan",
     ownerPersonId: "person-maria",
     type: "payer",
     vendor: "Riverside Health Plan",
@@ -308,12 +310,46 @@ export const SEED_CONNECTORS: Connector[] = [
   },
   {
     id: "connector-david-hsa",
+    connectorOptionId: "healthequity",
     ownerPersonId: "person-david",
     type: "hsa_fsa_card",
     vendor: "HealthEquity",
     status: "connected",
     credentialRef: "vault-ref-2",
     lastSyncedAt: "2026-09-10T08:00:00.000Z",
+  },
+];
+
+export const SEED_AVAILABLE_CONNECTORS: ConnectorOption[] = [
+  {
+    id: "riverside-health-plan",
+    connectorType: "payer",
+    vendor: "Riverside Health Plan",
+  },
+  {
+    id: "brightpath-insurance",
+    connectorType: "payer",
+    vendor: "BrightPath Insurance",
+  },
+  {
+    id: "healthequity",
+    connectorType: "hsa_fsa_card",
+    vendor: "HealthEquity",
+  },
+  {
+    id: "riverside-family-pediatrics",
+    connectorType: "provider_portal",
+    vendor: "Riverside Family Medicine Pediatrics",
+  },
+  {
+    id: "riverside-orthopedics",
+    connectorType: "provider_portal",
+    vendor: "Riverside Orthopedics",
+  },
+  {
+    id: "oracle-health-record",
+    connectorType: "phr_ehr",
+    vendor: "Oracle Health Record",
   },
 ];
 
@@ -370,6 +406,7 @@ export function getSeedData() {
     documents: SEED_DOCUMENTS,
     careTeam: SEED_CARE_TEAM,
     connectors: SEED_CONNECTORS,
+    availableConnectors: SEED_AVAILABLE_CONNECTORS,
     tasks: SEED_TASKS,
     chatThread: SEED_CHAT_THREAD,
   };

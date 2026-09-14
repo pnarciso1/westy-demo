@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  NavBar,
   Card,
   CardKicker,
   CardTitle,
@@ -16,6 +15,7 @@ import {
 } from "@westy/shared/ui";
 import type { DashboardSummary } from "@westy/shared/client";
 import { mockWestyClient } from "@/lib/mock";
+import { AppNav } from "./components/AppNav";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -52,15 +52,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <NavBar
-        brand="Westy"
-        links={[
-          { label: "Dashboard", href: "#dashboard", active: true },
-          { label: "My Care Team", href: "#care-team" },
-          { label: "Bills", href: "#bills" },
-          { label: "Household", href: "#household" },
-        ]}
-      />
+      <AppNav active="dashboard" />
      <main style={{ padding: "var(--space-6)", maxWidth: 960, margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
         {!summary ? (
           <>
