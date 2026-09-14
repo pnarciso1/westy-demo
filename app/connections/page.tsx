@@ -82,22 +82,155 @@ function connectableOptionsForPerson(
   return options.filter((option) => optionMatchesGroup(option, group) && !unavailableOptionIds.has(option.id));
 }
 
-export default function ConnectionsPage() {
-  const pendingConnectorCounter = useRef(0);
-  const removedConnectorIds = useRef(new Set<string>());
-  const [members, setMembers] = useState<Person[]>([]);
-  const [connections, setConnections] = useState<ConnectionRow[]>([]);
-  const [availableConnectors, setAvailableConnectors] = useState<ConnectorOption[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [connectDialogOpen, setConnectDialogOpen] = useState(false);
-  const [managedConnectorId, setManagedConnectorId] = useState<string | null>(null);
-  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
-  const [selectedConnectionGroup, setSelectedConnectionGroup] = useState<ConnectionTypeGroup>("provider");
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [optionSearch, setOptionSearch] = useState("");
-  const [startingConnection, setStartingConnection] = useState(false);
-  const [managingConnection, setManagingConnection] = useState(false);
+function ConnectionsSummary({ onStartConnection }: { onStartConnection: () => void }) {
+  return (
+    <section>
+      <SectionLabel>Connections</SectionLabel>
+      <Card>
+        <CardKicker>Data sync</CardKicker>
+        <CardTitle>Connected accounts</CardTitle>
+        <CardBody>
+          Manage payer, provider portal, PHR/EHR, and HSA/FSA connections for the Ramirez household.
+        </CardBody>
+        <div>
+          <Button variant="primary" onClick={onStartConnection}>
+            Start a new connection
+          </Button>
+        </div>
+      </Card>
+    </section>
+  );
+}
 
+function ConnectionCard({ row, onManage }: { row: ConnectionRow; onManage: (connectorId: string) => void }) {
+  const { connector, owner } = row;
+
+  return (
+    <Card
+      key={connector.id}
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: "var(--space-4)",
+        borderLeft:
+          connector.status === "error"
+            ? "3px solid var(--color-accent)"
+            : connector.status === "connected"
+              ? "3px solid var(--color-accent-2)"
+              : "3px solid var(--color-divider)",
+      }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)", flexWrap: "wrap" }}>
+          <Tag variant={statusVariant(connector.status)}>{statusLabel(connector.status)}</Tag>
+          {connector.status === "error" && <Tag variant="outline">Manual upload available</Tag>}
+        </div>
+        <CardTitle>{connector.vendor}</CardTitle>
+        <CardMeta>
+          {connectorLabel(connector.type)} for {owner.firstName} {owner.lastName}
+        </CardMeta>
+        {connector.lastSyncedAt && <CardBody>Last synced {new Date(connector.lastSyncedAt).toLocaleDateString()}</CardBody>}
+        {connector.syncError && <CardBody>{connector.syncError}</CardBody>}
+        {connector.status === "error" && (
+          <div style={{ marginTop: "var(--space-2)" }}>
+            <Button variant="ghost" onClick={() => onManage(connector.id)}>
+              Upload instead
+            </Button>
+          </div>
+        )}
+      </div>
+      <Button variant="secondary" onClick={() => onManage(connector.id)}>
+        Manage
+      </Button>
+    </Card>
+  );
+}
+
+function ExistingConnections({
+  connections,
+  onManage,
+}: {
+  connections: ConnectionRow[];
+  onManage: (connectorId: string) => void;
+}) {
+  return (
+    <section>
+      <SectionLabel>Existing connections</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+        {connections.map((row) => (
+          <ConnectionCard key={row.connector.id} row={row} onManage={onManage} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HouseholdConnectionCards({
+  members,
+  connections,
+  onConnect,
+}: {
+  members: Person[];
+  connections: ConnectionRow[];
+  onConnect: (personId: string) => void;
+}) {
+  return (
+    <section>
+      <SectionLabel>Available next connections</SectionLabel>
+      <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+        {members.map((member) => {
+          const hasConnection = connections.some(({ owner }) => owner.id === member.id);
+          return (
+            <Card key={member.id} style={{ minWidth: 220 }}>
+              <CardKicker>{member.relationshipToCoordinator ?? "member"}</CardKicker>
+              <CardTitle>
+                {member.firstName} {member.lastName}
+              </CardTitle>
+              <CardBody>
+                {hasConnection
+                  ? "Add another payer or provider portal for this household member."
+                  : "No active data connection yet."}
+              </CardBody>
+              <div>
+                <Button variant={hasConnection ? "secondary" : "primary"} onClick={() => onConnect(member.id)}>
+                  Connect
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+interface StartConnectionDialogProps {
+  members: Person[];
+  connections: ConnectionRow[];
+  availableConnectors: ConnectorOption[];
+  initialPersonId: string | null;
+  startingConnection: boolean;
+  onDismiss: () => void;
+  onStartConnection: (personId: string, option: ConnectorOption) => void;
+}
+
+function StartConnectionDialog({
+  members,
+  connections,
+  availableConnectors,
+  initialPersonId,
+  startingConnection,
+  onDismiss,
+  onStartConnection,
+}: StartConnectionDialogProps) {
+  const initialSelectedPersonId = initialPersonId ?? members[0]?.id ?? null;
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(initialSelectedPersonId);
+  const [selectedConnectionGroup, setSelectedConnectionGroup] = useState<ConnectionTypeGroup>("provider");
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(
+    connectableOptionsForPerson(availableConnectors, connections, initialSelectedPersonId, "provider")[0]?.id ?? null
+  );
+  const [optionSearch, setOptionSearch] = useState("");
   const connectableOptions = connectableOptionsForPerson(
     availableConnectors,
     connections,
@@ -109,6 +242,207 @@ export default function ConnectionsPage() {
   const visibleOptions = normalizedOptionSearch
     ? connectableOptions.filter((option) => option.vendor.toLowerCase().includes(normalizedOptionSearch))
     : connectableOptions;
+
+  function handleSelectPerson(personId: string) {
+    const nextOption =
+      connectableOptionsForPerson(availableConnectors, connections, personId, selectedConnectionGroup)[0] ?? null;
+
+    setSelectedPersonId(personId);
+    setSelectedOptionId(nextOption?.id ?? null);
+    setOptionSearch("");
+  }
+
+  function handleSelectConnectionGroup(group: ConnectionTypeGroup) {
+    const nextOption =
+      connectableOptionsForPerson(availableConnectors, connections, selectedPersonId, group)[0] ?? null;
+
+    setSelectedConnectionGroup(group);
+    setSelectedOptionId(nextOption?.id ?? null);
+    setOptionSearch("");
+  }
+
+  function handleStartConnection() {
+    if (!selectedPersonId || !selectedOption) return;
+    onStartConnection(selectedPersonId, selectedOption);
+  }
+
+  return (
+    <Dialog
+      open={true}
+      title="Start a new connection"
+      onDismiss={startingConnection ? undefined : onDismiss}
+      actions={
+        <>
+          <Button variant="ghost" onClick={onDismiss} disabled={startingConnection}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleStartConnection}
+            disabled={startingConnection || !selectedOption || !selectedPersonId}
+          >
+            {startingConnection ? "Connecting..." : "Connect"}
+          </Button>
+        </>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <Field label="Who is this for?" htmlFor="connection-owner">
+          <select
+            id="connection-owner"
+            className="input"
+            value={selectedPersonId ?? ""}
+            onChange={(event) => handleSelectPerson(event.target.value)}
+          >
+            {members.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.firstName} {member.lastName}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Connection type" htmlFor="connection-type">
+          <SegmentedControl
+            name="connection-type"
+            options={CONNECTION_TYPE_GROUPS}
+            value={selectedConnectionGroup}
+            onChange={(value) => handleSelectConnectionGroup(value as ConnectionTypeGroup)}
+          />
+        </Field>
+
+        <Field label="Find a connection" htmlFor="connection-search">
+          <TextInput
+            id="connection-search"
+            placeholder="Search providers, payers, or accounts"
+            value={optionSearch}
+            onChange={(event) => setOptionSearch(event.target.value)}
+          />
+        </Field>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", maxHeight: 260, overflowY: "auto" }}>
+          {connectableOptions.length === 0 ? (
+            <CardBody>No new demo connectors are available for this person and type.</CardBody>
+          ) : visibleOptions.length === 0 ? (
+            <CardBody>No matching connections.</CardBody>
+          ) : visibleOptions.map((option) => {
+            const selected = option.id === selectedOption?.id;
+            return (
+              <Button
+                key={option.id}
+                variant={selected ? "primary" : "secondary"}
+                block
+                aria-pressed={selected}
+                onClick={() => setSelectedOptionId(option.id)}
+                type="button"
+              >
+                <span style={{ display: "block" }}>{option.vendor}</span>
+                <span style={{ display: "block", fontWeight: 400 }}>{connectorLabel(option.connectorType)}</span>
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
+interface ManageConnectionDialogProps {
+  managedConnection: ConnectionRow | null;
+  managingConnection: boolean;
+  onDismiss: () => void;
+  onRetry: (row: ConnectionRow) => void;
+  onRemove: (row: ConnectionRow) => void;
+}
+
+function ManageConnectionDialog({
+  managedConnection,
+  managingConnection,
+  onDismiss,
+  onRetry,
+  onRemove,
+}: ManageConnectionDialogProps) {
+  return (
+    <Dialog
+      open={!!managedConnection}
+      title="Manage connection"
+      onDismiss={managingConnection ? undefined : onDismiss}
+      actions={
+        managedConnection && (
+          <>
+            <Button variant="ghost" onClick={onDismiss} disabled={managingConnection}>
+              Close
+            </Button>
+            {(managedConnection.connector.status === "error" ||
+              managedConnection.connector.status === "disconnected") && (
+              <Button
+                variant="secondary"
+                onClick={() => onRetry(managedConnection)}
+                disabled={managingConnection}
+              >
+                Retry
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              onClick={() => onRemove(managedConnection)}
+              disabled={managingConnection}
+            >
+              {managedConnection.connector.status === "pending" ? "Cancel connection" : "Remove connection"}
+            </Button>
+          </>
+        )
+      }
+    >
+      {managedConnection && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <div>
+            <CardTitle>{managedConnection.connector.vendor}</CardTitle>
+            <CardMeta>
+              {connectorLabel(managedConnection.connector.type)} for {managedConnection.owner.firstName}{" "}
+              {managedConnection.owner.lastName}
+            </CardMeta>
+          </div>
+          <div>
+            <Tag variant={statusVariant(managedConnection.connector.status)}>
+              {statusLabel(managedConnection.connector.status)}
+            </Tag>
+          </div>
+          {managedConnection.connector.syncError && <CardBody>{managedConnection.connector.syncError}</CardBody>}
+          {managedConnection.connector.status === "error" && (
+            <Card>
+              <CardKicker>Alternative</CardKicker>
+              <CardTitle>Upload documents instead</CardTitle>
+              {/* TODO: Wire this into the manual upload flow once that demo screen exists. */}
+              <CardBody>
+                You can still add bills, EOBs, or insurance summaries manually while this connection is unavailable.
+              </CardBody>
+              <div>
+                <Button variant="secondary" disabled>
+                  Upload instead
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
+    </Dialog>
+  );
+}
+
+export default function ConnectionsPage() {
+  const pendingConnectorCounter = useRef(0);
+  const removedConnectorIds = useRef(new Set<string>());
+  const [members, setMembers] = useState<Person[]>([]);
+  const [connections, setConnections] = useState<ConnectionRow[]>([]);
+  const [availableConnectors, setAvailableConnectors] = useState<ConnectorOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+  const [connectDialogInitialPersonId, setConnectDialogInitialPersonId] = useState<string | null>(null);
+  const [managedConnectorId, setManagedConnectorId] = useState<string | null>(null);
+  const [startingConnection, setStartingConnection] = useState(false);
+  const [managingConnection, setManagingConnection] = useState(false);
+
   const managedConnection = connections.find(({ connector }) => connector.id === managedConnectorId) ?? null;
 
   useEffect(() => {
@@ -143,47 +477,11 @@ export default function ConnectionsPage() {
   }, []);
 
   function openConnectDialog(personId?: string) {
-    const nextPersonId = personId ?? selectedPersonId ?? members[0]?.id ?? null;
-    const nextConnectableOptions = connectableOptionsForPerson(
-      availableConnectors,
-      connections,
-      nextPersonId,
-      selectedConnectionGroup
-    );
-    const nextOption = nextConnectableOptions.find((option) => option.id === selectedOptionId) ?? nextConnectableOptions[0] ?? null;
-
-    setSelectedPersonId(nextPersonId);
-    if (nextOption) {
-      setSelectedOptionId(nextOption.id);
-    }
-    setOptionSearch("");
+    setConnectDialogInitialPersonId(personId ?? null);
     setConnectDialogOpen(true);
   }
 
-  function selectOption(option: ConnectorOption) {
-    setSelectedOptionId(option.id);
-  }
-
-  function selectConnectionGroup(group: ConnectionTypeGroup) {
-    const nextOption =
-      connectableOptionsForPerson(availableConnectors, connections, selectedPersonId, group)[0] ?? null;
-
-    setSelectedConnectionGroup(group);
-    setSelectedOptionId(nextOption?.id ?? null);
-    setOptionSearch("");
-  }
-
-  function selectPerson(personId: string) {
-    const nextOption =
-      connectableOptionsForPerson(availableConnectors, connections, personId, selectedConnectionGroup)[0] ?? null;
-
-    setSelectedPersonId(personId);
-    setSelectedOptionId(nextOption?.id ?? null);
-    setOptionSearch("");
-  }
-
-  async function handleStartConnection() {
-    if (!selectedOption || !selectedPersonId) return;
+  async function handleStartConnection(selectedPersonId: string, selectedOption: ConnectorOption) {
     setStartingConnection(true);
     setConnectDialogOpen(false);
 
@@ -277,21 +575,7 @@ export default function ConnectionsPage() {
           gap: "var(--space-6)",
         }}
       >
-        <section>
-          <SectionLabel>Connections</SectionLabel>
-          <Card>
-            <CardKicker>Data sync</CardKicker>
-            <CardTitle>Connected accounts</CardTitle>
-            <CardBody>
-              Manage payer, provider portal, PHR/EHR, and HSA/FSA connections for the Ramirez household.
-            </CardBody>
-            <div>
-              <Button variant="primary" onClick={() => openConnectDialog()}>
-                Start a new connection
-              </Button>
-            </div>
-          </Card>
-        </section>
+        <ConnectionsSummary onStartConnection={() => openConnectDialog()} />
 
         {loading ? (
           <>
@@ -300,224 +584,29 @@ export default function ConnectionsPage() {
           </>
         ) : (
           <>
-            <section>
-              <SectionLabel>Existing connections</SectionLabel>
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                {connections.map(({ connector, owner }) => (
-                  <Card
-                    key={connector.id}
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "var(--space-4)",
-                      borderLeft:
-                        connector.status === "error"
-                          ? "3px solid var(--color-accent)"
-                          : connector.status === "connected"
-                            ? "3px solid var(--color-accent-2)"
-                            : "3px solid var(--color-divider)",
-                    }}
-                  >
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)", flexWrap: "wrap" }}>
-                        <Tag variant={statusVariant(connector.status)}>{statusLabel(connector.status)}</Tag>
-                        {connector.status === "error" && <Tag variant="outline">Manual upload available</Tag>}
-                      </div>
-                      <CardTitle>{connector.vendor}</CardTitle>
-                      <CardMeta>
-                        {connectorLabel(connector.type)} for {owner.firstName} {owner.lastName}
-                      </CardMeta>
-                      {connector.lastSyncedAt && (
-                        <CardBody>Last synced {new Date(connector.lastSyncedAt).toLocaleDateString()}</CardBody>
-                      )}
-                      {connector.syncError && <CardBody>{connector.syncError}</CardBody>}
-                      {connector.status === "error" && (
-                        <div style={{ marginTop: "var(--space-2)" }}>
-                          <Button variant="ghost" onClick={() => setManagedConnectorId(connector.id)}>
-                            Upload instead
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    <Button variant="secondary" onClick={() => setManagedConnectorId(connector.id)}>
-                      Manage
-                    </Button>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            <section>
-              <SectionLabel>Available next connections</SectionLabel>
-              <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                {members.map((member) => {
-                  const hasConnection = connections.some(({ owner }) => owner.id === member.id);
-                  return (
-                    <Card key={member.id} style={{ minWidth: 220 }}>
-                      <CardKicker>{member.relationshipToCoordinator ?? "member"}</CardKicker>
-                      <CardTitle>
-                        {member.firstName} {member.lastName}
-                      </CardTitle>
-                      <CardBody>
-                        {hasConnection
-                          ? "Add another payer or provider portal for this household member."
-                          : "No active data connection yet."}
-                      </CardBody>
-                      <div>
-                        <Button variant={hasConnection ? "secondary" : "primary"} onClick={() => openConnectDialog(member.id)}>
-                          Connect
-                        </Button>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
+            <ExistingConnections connections={connections} onManage={setManagedConnectorId} />
+            <HouseholdConnectionCards members={members} connections={connections} onConnect={openConnectDialog} />
           </>
         )}
       </main>
-      <Dialog
-        open={connectDialogOpen}
-        title="Start a new connection"
-        onDismiss={startingConnection ? undefined : () => setConnectDialogOpen(false)}
-        actions={
-          <>
-            <Button variant="ghost" onClick={() => setConnectDialogOpen(false)} disabled={startingConnection}>
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleStartConnection}
-              disabled={startingConnection || !selectedOption || !selectedPersonId}
-            >
-              {startingConnection ? "Connecting..." : "Connect"}
-            </Button>
-          </>
-        }
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          <Field label="Who is this for?" htmlFor="connection-owner">
-            <select
-              id="connection-owner"
-              className="input"
-              value={selectedPersonId ?? ""}
-              onChange={(event) => selectPerson(event.target.value)}
-            >
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.firstName} {member.lastName}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field label="Connection type" htmlFor="connection-type">
-            <SegmentedControl
-              name="connection-type"
-              options={CONNECTION_TYPE_GROUPS}
-              value={selectedConnectionGroup}
-              onChange={(value) => selectConnectionGroup(value as ConnectionTypeGroup)}
-            />
-          </Field>
-
-          <Field label="Find a connection" htmlFor="connection-search">
-            <TextInput
-              id="connection-search"
-              placeholder="Search providers, payers, or accounts"
-              value={optionSearch}
-              onChange={(event) => setOptionSearch(event.target.value)}
-            />
-          </Field>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", maxHeight: 260, overflowY: "auto" }}>
-            {connectableOptions.length === 0 ? (
-              <CardBody>No new demo connectors are available for this person and type.</CardBody>
-            ) : visibleOptions.length === 0 ? (
-              <CardBody>No matching connections.</CardBody>
-            ) : visibleOptions.map((option) => {
-              const selected = option.id === selectedOption?.id;
-              return (
-                <Button
-                  key={option.id}
-                  variant={selected ? "primary" : "secondary"}
-                  block
-                  aria-pressed={selected}
-                  onClick={() => selectOption(option)}
-                  type="button"
-                >
-                  <span style={{ display: "block" }}>{option.vendor}</span>
-                  <span style={{ display: "block", fontWeight: 400 }}>{connectorLabel(option.connectorType)}</span>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-      </Dialog>
-      <Dialog
-        open={!!managedConnection}
-        title="Manage connection"
-        onDismiss={managingConnection ? undefined : () => setManagedConnectorId(null)}
-        actions={
-          managedConnection && (
-            <>
-              <Button variant="ghost" onClick={() => setManagedConnectorId(null)} disabled={managingConnection}>
-                Close
-              </Button>
-              {(managedConnection.connector.status === "error" ||
-                managedConnection.connector.status === "disconnected") && (
-                <Button
-                  variant="secondary"
-                  onClick={() => handleRetryConnection(managedConnection)}
-                  disabled={managingConnection}
-                >
-                  Retry
-                </Button>
-              )}
-              <Button
-                variant="primary"
-                onClick={() => handleRemoveConnection(managedConnection)}
-                disabled={managingConnection}
-              >
-                {managedConnection.connector.status === "pending" ? "Cancel connection" : "Remove connection"}
-              </Button>
-            </>
-          )
-        }
-      >
-        {managedConnection && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-            <div>
-              <CardTitle>{managedConnection.connector.vendor}</CardTitle>
-              <CardMeta>
-                {connectorLabel(managedConnection.connector.type)} for {managedConnection.owner.firstName}{" "}
-                {managedConnection.owner.lastName}
-              </CardMeta>
-            </div>
-            <div>
-              <Tag variant={statusVariant(managedConnection.connector.status)}>
-                {statusLabel(managedConnection.connector.status)}
-              </Tag>
-            </div>
-            {managedConnection.connector.syncError && <CardBody>{managedConnection.connector.syncError}</CardBody>}
-            {managedConnection.connector.status === "error" && (
-              <Card>
-                <CardKicker>Alternative</CardKicker>
-                <CardTitle>Upload documents instead</CardTitle>
-                {/* TODO: Wire this into the manual upload flow once that demo screen exists. */}
-                <CardBody>
-                  You can still add bills, EOBs, or insurance summaries manually while this connection is unavailable.
-                </CardBody>
-                <div>
-                  <Button variant="secondary" disabled>
-                    Upload instead
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
-      </Dialog>
+      {connectDialogOpen && (
+        <StartConnectionDialog
+          members={members}
+          connections={connections}
+          availableConnectors={availableConnectors}
+          initialPersonId={connectDialogInitialPersonId}
+          startingConnection={startingConnection}
+          onDismiss={() => setConnectDialogOpen(false)}
+          onStartConnection={handleStartConnection}
+        />
+      )}
+      <ManageConnectionDialog
+        managedConnection={managedConnection}
+        managingConnection={managingConnection}
+        onDismiss={() => setManagedConnectorId(null)}
+        onRetry={handleRetryConnection}
+        onRemove={handleRemoveConnection}
+      />
     </>
   );
 }
