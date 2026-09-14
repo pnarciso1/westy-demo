@@ -15,6 +15,7 @@ import {
   SegmentedControl,
   Skeleton,
   Tag,
+  TextInput,
 } from "@westy/shared/ui";
 // TODO: Replace with `import type { Connector, ConnectorOption } from "@westy/shared"` once both interfaces are added there.
 import type { Connector, ConnectorOption } from "@/lib/demo/connectorTypes";
@@ -56,10 +57,6 @@ function optionMatchesGroup(option: ConnectorOption, group: ConnectionTypeGroup)
   return option.connectorType === group;
 }
 
-function firstOptionForGroup(options: ConnectorOption[], group: ConnectionTypeGroup) {
-  return options.find((option) => optionMatchesGroup(option, group));
-}
-
 function usedConnectorOptionIds(connections: ConnectionRow[], personId: string | null) {
   if (!personId) return new Set<string>();
 
@@ -90,6 +87,7 @@ export default function ConnectionsPage() {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [selectedConnectionGroup, setSelectedConnectionGroup] = useState<ConnectionTypeGroup>("provider");
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [optionSearch, setOptionSearch] = useState("");
   const [startingConnection, setStartingConnection] = useState(false);
 
   const connectableOptions = connectableOptionsForPerson(
@@ -99,6 +97,10 @@ export default function ConnectionsPage() {
     selectedConnectionGroup
   );
   const selectedOption = connectableOptions.find((option) => option.id === selectedOptionId) ?? null;
+  const normalizedOptionSearch = optionSearch.trim().toLowerCase();
+  const visibleOptions = normalizedOptionSearch
+    ? connectableOptions.filter((option) => option.vendor.toLowerCase().includes(normalizedOptionSearch))
+    : connectableOptions;
 
   useEffect(() => {
     let cancelled = false;
@@ -145,6 +147,7 @@ export default function ConnectionsPage() {
     if (nextOption) {
       setSelectedOptionId(nextOption.id);
     }
+    setOptionSearch("");
     setConnectDialogOpen(true);
   }
 
@@ -153,8 +156,12 @@ export default function ConnectionsPage() {
   }
 
   function selectConnectionGroup(group: ConnectionTypeGroup) {
+    const nextOption =
+      connectableOptionsForPerson(availableConnectors, connections, selectedPersonId, group)[0] ?? null;
+
     setSelectedConnectionGroup(group);
-    setSelectedOptionId(firstOptionForGroup(connectableOptions, group)?.id ?? null);
+    setSelectedOptionId(nextOption?.id ?? null);
+    setOptionSearch("");
   }
 
   function selectPerson(personId: string) {
@@ -163,6 +170,7 @@ export default function ConnectionsPage() {
 
     setSelectedPersonId(personId);
     setSelectedOptionId(nextOption?.id ?? null);
+    setOptionSearch("");
   }
 
   async function handleStartConnection() {
@@ -338,20 +346,33 @@ export default function ConnectionsPage() {
             />
           </Field>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+          <Field label="Find a connection" htmlFor="connection-search">
+            <TextInput
+              id="connection-search"
+              placeholder="Search providers, payers, or accounts"
+              value={optionSearch}
+              onChange={(event) => setOptionSearch(event.target.value)}
+            />
+          </Field>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", maxHeight: 260, overflowY: "auto" }}>
             {connectableOptions.length === 0 ? (
               <CardBody>No new demo connectors are available for this person and type.</CardBody>
-            ) : connectableOptions.map((option) => {
+            ) : visibleOptions.length === 0 ? (
+              <CardBody>No matching connections.</CardBody>
+            ) : visibleOptions.map((option) => {
               const selected = option.id === selectedOption?.id;
               return (
                 <Button
                   key={option.id}
                   variant={selected ? "primary" : "secondary"}
                   block
+                  aria-pressed={selected}
                   onClick={() => selectOption(option)}
                   type="button"
                 >
                   <span style={{ display: "block" }}>{option.vendor}</span>
+                  <span style={{ display: "block", fontWeight: 400 }}>{connectorLabel(option.connectorType)}</span>
                 </Button>
               );
             })}
