@@ -240,6 +240,14 @@ export class MockWestyClient implements WestyClient {
     return connector;
   }
 
+  /** Demo-only removal path. Distinct from disconnecting, which models an integration health state. */
+  async removeConnector(connectorId: string): Promise<void> {
+    await delay(150);
+    const index = this.state.connectors.findIndex((c) => c.id === connectorId);
+    if (index < 0) notFound("Connector", connectorId);
+    this.state.connectors.splice(index, 1);
+  }
+
   // ── Documents ────────────────────────────────────────────────────────
   async uploadDocument(input: UploadDocumentInput): Promise<WestyDocument> {
     await delay(300);

@@ -79,16 +79,19 @@ function connectableOptionsForPerson(
 
 export default function ConnectionsPage() {
   const pendingConnectorCounter = useRef(0);
+  const removedConnectorIds = useRef(new Set<string>());
   const [members, setMembers] = useState<Person[]>([]);
   const [connections, setConnections] = useState<ConnectionRow[]>([]);
   const [availableConnectors, setAvailableConnectors] = useState<ConnectorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+  const [managedConnectorId, setManagedConnectorId] = useState<string | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [selectedConnectionGroup, setSelectedConnectionGroup] = useState<ConnectionTypeGroup>("provider");
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [optionSearch, setOptionSearch] = useState("");
   const [startingConnection, setStartingConnection] = useState(false);
+  const [managingConnection, setManagingConnection] = useState(false);
 
   const connectableOptions = connectableOptionsForPerson(
     availableConnectors,
@@ -101,6 +104,7 @@ export default function ConnectionsPage() {
   const visibleOptions = normalizedOptionSearch
     ? connectableOptions.filter((option) => option.vendor.toLowerCase().includes(normalizedOptionSearch))
     : connectableOptions;
+  const managedConnection = connections.find(({ connector }) => connector.id === managedConnectorId) ?? null;
 
   useEffect(() => {
     let cancelled = false;
@@ -199,10 +203,60 @@ export default function ConnectionsPage() {
       vendor: selectedOption.vendor,
     });
 
+    if (removedConnectorIds.current.has(pendingConnector.id)) {
+      await mockWestyClient.removeConnector(connector.id);
+      setStartingConnection(false);
+      return;
+    }
+
     setConnections((current) =>
       current.map((row) => (row.connector.id === pendingConnector.id ? { connector, owner } : row))
     );
     setStartingConnection(false);
+  }
+
+  async function handleRetryConnection(row: ConnectionRow) {
+    if (row.connector.status !== "error" && row.connector.status !== "disconnected") return;
+
+    setManagingConnection(true);
+    setManagedConnectorId(null);
+    const pendingConnector: Connector = {
+      ...row.connector,
+      status: "pending",
+      syncError: undefined,
+    };
+    setConnections((current) =>
+      current.map((currentRow) =>
+        currentRow.connector.id === row.connector.id ? { connector: pendingConnector, owner: row.owner } : currentRow
+      )
+    );
+
+    const connector = await mockWestyClient.retryConnector(row.connector.id);
+    if (removedConnectorIds.current.has(row.connector.id)) {
+      await mockWestyClient.removeConnector(connector.id);
+      setManagingConnection(false);
+      return;
+    }
+
+    setConnections((current) =>
+      current.map((currentRow) =>
+        currentRow.connector.id === connector.id ? { connector, owner: row.owner } : currentRow
+      )
+    );
+    setManagingConnection(false);
+  }
+
+  async function handleRemoveConnection(row: ConnectionRow) {
+    setManagingConnection(true);
+    setManagedConnectorId(null);
+    removedConnectorIds.current.add(row.connector.id);
+    setConnections((current) => current.filter(({ connector }) => connector.id !== row.connector.id));
+
+    if (!row.connector.id.startsWith("pending-")) {
+      await mockWestyClient.removeConnector(row.connector.id);
+    }
+
+    setManagingConnection(false);
   }
 
   return (
@@ -267,7 +321,9 @@ export default function ConnectionsPage() {
                       )}
                       {connector.syncError && <CardBody>{connector.syncError}</CardBody>}
                     </div>
-                    <Button variant="secondary">Manage</Button>
+                    <Button variant="secondary" onClick={() => setManagedConnectorId(connector.id)}>
+                      Manage
+                    </Button>
                   </Card>
                 ))}
               </div>
@@ -378,6 +434,55 @@ export default function ConnectionsPage() {
             })}
           </div>
         </div>
+      </Dialog>
+      <Dialog
+        open={!!managedConnection}
+        title="Manage connection"
+        onDismiss={managingConnection ? undefined : () => setManagedConnectorId(null)}
+        actions={
+          managedConnection && (
+            <>
+              <Button variant="ghost" onClick={() => setManagedConnectorId(null)} disabled={managingConnection}>
+                Close
+              </Button>
+              {(managedConnection.connector.status === "error" ||
+                managedConnection.connector.status === "disconnected") && (
+                <Button
+                  variant="secondary"
+                  onClick={() => handleRetryConnection(managedConnection)}
+                  disabled={managingConnection}
+                >
+                  Retry
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                onClick={() => handleRemoveConnection(managedConnection)}
+                disabled={managingConnection}
+              >
+                {managedConnection.connector.status === "pending" ? "Cancel connection" : "Remove connection"}
+              </Button>
+            </>
+          )
+        }
+      >
+        {managedConnection && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+            <div>
+              <CardTitle>{managedConnection.connector.vendor}</CardTitle>
+              <CardMeta>
+                {connectorLabel(managedConnection.connector.type)} for {managedConnection.owner.firstName}{" "}
+                {managedConnection.owner.lastName}
+              </CardMeta>
+            </div>
+            <div>
+              <Tag variant={statusVariant(managedConnection.connector.status)}>
+                {managedConnection.connector.status}
+              </Tag>
+            </div>
+            {managedConnection.connector.syncError && <CardBody>{managedConnection.connector.syncError}</CardBody>}
+          </div>
+        )}
       </Dialog>
     </>
   );
