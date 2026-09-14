@@ -27,6 +27,8 @@ import type {
   ProposedSlot,
   DashboardSummary,
 } from "@westy/shared/client";
+// TODO: Replace with `import type { ConnectorOption } from "@westy/shared"` once the interface is added there.
+import type { ConnectorOption } from "@/lib/demo/connectorTypes";
 import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
 
@@ -105,6 +107,7 @@ export class MockWestyClient implements WestyClient {
     // Person into `this.state` — onboarding here is illustrated as its own
     // flow, separate from the seeded Ramirez dashboard. See input for what
     // a real implementation would do with firstName/lastName/dateOfBirth.
+    void personId;
     void input;
     this.state.onboardingSessions.set(session.id, session);
     return session;
@@ -165,6 +168,11 @@ export class MockWestyClient implements WestyClient {
   }
 
   // ── Connector module ─────────────────────────────────────────────────
+  async listAvailableConnectors(): Promise<ConnectorOption[]> {
+    await delay(200);
+    return this.state.availableConnectors;
+  }
+
   async listConnectors(personId: string): Promise<Connector[]> {
     await delay(200);
     return this.state.connectors.filter((c) => c.ownerPersonId === personId);
@@ -181,23 +189,24 @@ export class MockWestyClient implements WestyClient {
       credentialRef: this.genId("vault-ref"),
     };
     this.state.connectors.push(connector);
-    this.resolveConnectorInBackground(connector.id, input);
-    return connector;
+    return this.resolveConnectorInBackground(connector.id, input);
   }
 
-  /** Fires after a realistic delay so the UI can show a genuine "connecting…" state before resolving. */
-  private resolveConnectorInBackground(connectorId: string, input: InitiateConnectorInput): void {
-    delay(1800).then(() => {
-      const connector = this.state.connectors.find((c) => c.id === connectorId);
-      if (!connector) return;
-      if (isScriptedFailure(input)) {
-        connector.status = "error";
-        connector.syncError = `${input.vendor} doesn't support direct connections yet — try uploading a bill or insurance summary instead.`;
-      } else {
-        connector.status = "connected";
-        connector.lastSyncedAt = new Date().toISOString();
-      }
-    });
+  /** Owns the simulated connection delay, then returns the updated connector for callers to render. */
+  private async resolveConnectorInBackground(
+    connectorId: string,
+    input: InitiateConnectorInput
+  ): Promise<Connector> {
+    await delay(1800);
+    const connector = this.state.connectors.find((c) => c.id === connectorId) ?? notFound("Connector", connectorId);
+    if (isScriptedFailure(input)) {
+      connector.status = "error";
+      connector.syncError = `${input.vendor} doesn't support direct connections yet — try uploading a bill or insurance summary instead.`;
+    } else {
+      connector.status = "connected";
+      connector.lastSyncedAt = new Date().toISOString();
+    }
+    return connector;
   }
 
   async getConnector(connectorId: string): Promise<Connector> {
@@ -212,12 +221,11 @@ export class MockWestyClient implements WestyClient {
     connector.syncError = undefined;
     // Retrying the scripted failure fails again, deterministically — this
     // provider genuinely doesn't have an integration, retrying wouldn't help.
-    this.resolveConnectorInBackground(connectorId, {
+    return this.resolveConnectorInBackground(connectorId, {
       ownerPersonId: connector.ownerPersonId,
       type: connector.type,
       vendor: connector.vendor,
     });
-    return connector;
   }
 
   async disconnectConnector(connectorId: string): Promise<Connector> {

@@ -13,6 +13,8 @@ import type {
   ChatThread,
   Task,
 } from "@westy/shared";
+// TODO: Replace with `import type { ConnectorOption } from "@westy/shared"` once the interface is added there.
+import type { ConnectorOption } from "@/lib/demo/connectorTypes";
 
 /**
  * The demo's single persona: the Ramirez household. Chosen to show depth
@@ -317,6 +319,39 @@ export const SEED_CONNECTORS: Connector[] = [
   },
 ];
 
+export const SEED_AVAILABLE_CONNECTORS: ConnectorOption[] = [
+  {
+    id: "riverside-health-plan",
+    connectorType: "payer",
+    vendor: "Riverside Health Plan",
+  },
+  {
+    id: "brightpath-insurance",
+    connectorType: "payer",
+    vendor: "BrightPath Insurance",
+  },
+  {
+    id: "healthequity",
+    connectorType: "hsa_fsa_card",
+    vendor: "HealthEquity",
+  },
+  {
+    id: "riverside-family-pediatrics",
+    connectorType: "provider_portal",
+    vendor: "Riverside Family Medicine Pediatrics",
+  },
+  {
+    id: "riverside-orthopedics",
+    connectorType: "provider_portal",
+    vendor: "Riverside Orthopedics",
+  },
+  {
+    id: "oracle-health-record",
+    connectorType: "phr_ehr",
+    vendor: "Oracle Health Record",
+  },
+];
+
 export const SEED_TASKS: Task[] = [
   {
     id: "task-sofia-followup",
@@ -370,6 +405,7 @@ export function getSeedData() {
     documents: SEED_DOCUMENTS,
     careTeam: SEED_CARE_TEAM,
     connectors: SEED_CONNECTORS,
+    availableConnectors: SEED_AVAILABLE_CONNECTORS,
     tasks: SEED_TASKS,
     chatThread: SEED_CHAT_THREAD,
   };

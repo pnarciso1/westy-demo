@@ -25,6 +25,7 @@ export interface MockState {
   documents: ReturnType<typeof getSeedData>["documents"];
   careTeam: ReturnType<typeof getSeedData>["careTeam"];
   connectors: ReturnType<typeof getSeedData>["connectors"];
+  availableConnectors: ReturnType<typeof getSeedData>["availableConnectors"];
   tasks: ReturnType<typeof getSeedData>["tasks"];
   onboardingSessions: Map<string, OnboardingSession>;
   appointmentRequests: Map<string, AppointmentRequest>;
@@ -48,6 +49,7 @@ export function createInitialState(): MockState {
     documents: structuredClone(seed.documents),
     careTeam: structuredClone(seed.careTeam),
     connectors: structuredClone(seed.connectors),
+    availableConnectors: structuredClone(seed.availableConnectors),
     tasks: structuredClone(seed.tasks),
     onboardingSessions: new Map(),
     appointmentRequests: new Map(),
