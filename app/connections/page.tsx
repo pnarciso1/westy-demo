@@ -49,6 +49,11 @@ function connectorLabel(type: Connector["type"]) {
     .join(" ");
 }
 
+function statusLabel(status: Connector["status"]) {
+  if (status === "pending") return "Connecting";
+  return status;
+}
+
 function optionMatchesGroup(option: ConnectorOption, group: ConnectionTypeGroup) {
   if (group === "provider") {
     return option.connectorType === "provider_portal" || option.connectorType === "phr_ehr";
@@ -306,11 +311,18 @@ export default function ConnectionsPage() {
                       justifyContent: "space-between",
                       alignItems: "center",
                       gap: "var(--space-4)",
+                      borderLeft:
+                        connector.status === "error"
+                          ? "3px solid var(--color-accent)"
+                          : connector.status === "connected"
+                            ? "3px solid var(--color-accent-2)"
+                            : "3px solid var(--color-divider)",
                     }}
                   >
-                    <div>
-                      <div style={{ marginBottom: "var(--space-2)" }}>
-                        <Tag variant={statusVariant(connector.status)}>{connector.status}</Tag>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-2)", flexWrap: "wrap" }}>
+                        <Tag variant={statusVariant(connector.status)}>{statusLabel(connector.status)}</Tag>
+                        {connector.status === "error" && <Tag variant="outline">Manual upload available</Tag>}
                       </div>
                       <CardTitle>{connector.vendor}</CardTitle>
                       <CardMeta>
@@ -320,6 +332,13 @@ export default function ConnectionsPage() {
                         <CardBody>Last synced {new Date(connector.lastSyncedAt).toLocaleDateString()}</CardBody>
                       )}
                       {connector.syncError && <CardBody>{connector.syncError}</CardBody>}
+                      {connector.status === "error" && (
+                        <div style={{ marginTop: "var(--space-2)" }}>
+                          <Button variant="ghost" onClick={() => setManagedConnectorId(connector.id)}>
+                            Upload instead
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     <Button variant="secondary" onClick={() => setManagedConnectorId(connector.id)}>
                       Manage
@@ -477,10 +496,25 @@ export default function ConnectionsPage() {
             </div>
             <div>
               <Tag variant={statusVariant(managedConnection.connector.status)}>
-                {managedConnection.connector.status}
+                {statusLabel(managedConnection.connector.status)}
               </Tag>
             </div>
             {managedConnection.connector.syncError && <CardBody>{managedConnection.connector.syncError}</CardBody>}
+            {managedConnection.connector.status === "error" && (
+              <Card>
+                <CardKicker>Alternative</CardKicker>
+                <CardTitle>Upload documents instead</CardTitle>
+                {/* TODO: Wire this into the manual upload flow once that demo screen exists. */}
+                <CardBody>
+                  You can still add bills, EOBs, or insurance summaries manually while this connection is unavailable.
+                </CardBody>
+                <div>
+                  <Button variant="secondary" disabled>
+                    Upload instead
+                  </Button>
+                </div>
+              </Card>
+            )}
           </div>
         )}
       </Dialog>
