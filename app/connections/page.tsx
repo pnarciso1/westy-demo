@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Connector, Person } from "@westy/shared";
+import type { Person } from "@westy/shared";
 import {
   Button,
   Card,
@@ -16,8 +16,8 @@ import {
   Skeleton,
   Tag,
 } from "@westy/shared/ui";
-// TODO: Replace with `import type { ConnectorOption } from "@westy/shared"` once the interface is added there.
-import type { ConnectorOption } from "@/lib/demo/connectorTypes";
+// TODO: Replace with `import type { Connector, ConnectorOption } from "@westy/shared"` once both interfaces are added there.
+import type { Connector, ConnectorOption } from "@/lib/demo/connectorTypes";
 import { mockWestyClient } from "@/lib/mock";
 import { AppNav } from "../components/AppNav";
 
@@ -138,6 +138,7 @@ export default function ConnectionsPage() {
     const pendingConnectorId = `pending-${selectedPersonId}-${selectedOption.id}-${pendingConnectorCounter.current}`;
     const pendingConnector: Connector = {
       id: pendingConnectorId,
+      connectorOptionId: selectedOption.id,
       ownerPersonId: selectedPersonId,
       type: selectedOption.connectorType,
       vendor: selectedOption.vendor,

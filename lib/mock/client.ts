@@ -4,7 +4,6 @@ import type {
   Person,
   OnboardingSession,
   OnboardingStep,
-  Connector,
   Document as WestyDocument,
   Episode,
   EpisodeSuggestion,
@@ -27,8 +26,8 @@ import type {
   ProposedSlot,
   DashboardSummary,
 } from "@westy/shared/client";
-// TODO: Replace with `import type { ConnectorOption } from "@westy/shared"` once the interface is added there.
-import type { ConnectorOption } from "@/lib/demo/connectorTypes";
+// TODO: Replace with `import type { Connector, ConnectorOption } from "@westy/shared"` once both interfaces are added there.
+import type { Connector, ConnectorOption } from "@/lib/demo/connectorTypes";
 import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
 
@@ -180,8 +179,14 @@ export class MockWestyClient implements WestyClient {
 
   async initiateConnector(input: InitiateConnectorInput): Promise<Connector> {
     await delay(250);
+    const connectorOption = this.state.availableConnectors.find(
+      (option) => option.connectorType === input.type && option.vendor === input.vendor
+    );
+    if (!connectorOption) notFound("ConnectorOption", `${input.type}:${input.vendor}`);
+
     const connector: Connector = {
       id: this.genId("connector"),
+      connectorOptionId: connectorOption.id,
       ownerPersonId: input.ownerPersonId,
       type: input.type,
       vendor: input.vendor,

@@ -9,12 +9,11 @@ import type {
   Anomaly,
   Document as WestyDocument,
   CareTeamMember,
-  Connector,
   ChatThread,
   Task,
 } from "@westy/shared";
-// TODO: Replace with `import type { ConnectorOption } from "@westy/shared"` once the interface is added there.
-import type { ConnectorOption } from "@/lib/demo/connectorTypes";
+// TODO: Replace with `import type { Connector, ConnectorOption } from "@westy/shared"` once both interfaces are added there.
+import type { Connector, ConnectorOption } from "@/lib/demo/connectorTypes";
 
 /**
  * The demo's single persona: the Ramirez household. Chosen to show depth
@@ -301,6 +300,7 @@ export const SEED_CARE_TEAM: CareTeamMember[] = [
 export const SEED_CONNECTORS: Connector[] = [
   {
     id: "connector-maria-payer",
+    connectorOptionId: "riverside-health-plan",
     ownerPersonId: "person-maria",
     type: "payer",
     vendor: "Riverside Health Plan",
@@ -310,6 +310,7 @@ export const SEED_CONNECTORS: Connector[] = [
   },
   {
     id: "connector-david-hsa",
+    connectorOptionId: "healthequity",
     ownerPersonId: "person-david",
     type: "hsa_fsa_card",
     vendor: "HealthEquity",
