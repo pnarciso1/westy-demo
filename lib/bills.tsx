@@ -1,4 +1,4 @@
-import type { Bill, Charge } from "@westy/shared";
+import type { Anomaly, Bill, Charge } from "@westy/shared";
 import { Tag } from "@westy/shared/ui";
 
 export function formatMoney(amount: number): string {
@@ -9,6 +9,12 @@ export function formatShortDate(iso: string): string {
   // Date-only ISO strings ("2026-08-20") parse as UTC midnight — format in
   // UTC too, or the viewer's local timezone can shift the displayed day back.
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(iso));
+}
+
+export function formatLongDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
+    new Date(iso)
+  );
 }
 
 /**
@@ -31,6 +37,75 @@ export function billTitle(charges: Charge[], providerDirectory: Record<string, s
   const providerId = charges[0]?.providerId;
   const providerName = providerId ? providerDirectory[providerId] ?? providerId : "Unknown provider";
   return `Bill from ${providerName}`;
+}
+
+/**
+ * The regulatory/policy citation and the specific corrective ask for each
+ * Anomaly.type — this is what lets an appeal letter argue something more
+ * substantive than "please reprocess this." Keyed by type (not
+ * suggestedAction) so the same reasoning applies no matter which action an
+ * anomaly happens to suggest.
+ */
+const APPEAL_ARGUMENTS: Record<Anomaly["type"], { citation: string; ask: string }> = {
+  balance_bill: {
+    citation:
+      "In-network providers are required to accept the plan's allowed amount as payment in full and may not bill patients for the difference.",
+    ask: "waive the balance-billed amount and limit my responsibility to my plan's normal in-network cost-share",
+  },
+  out_of_network_surprise: {
+    citation:
+      "Under the federal No Surprises Act, emergency care must be covered at in-network cost-sharing rates regardless of the treating provider's network status.",
+    ask: "reprocess this claim at in-network rates and adjust my patient responsibility accordingly",
+  },
+  duplicate_charge: {
+    citation: "This service appears to have been billed more than once for the same encounter.",
+    ask: "remove the duplicate charge and reprocess this claim for the single service actually rendered",
+  },
+  coding_mismatch: {
+    citation: "The procedure code submitted does not match the service documented for this visit.",
+    ask: "correct the billing code and reprocess this claim under the accurate code",
+  },
+  other: {
+    citation: "This charge does not appear to be consistent with my plan's benefits.",
+    ask: "review and correct this charge in line with my plan's benefit terms",
+  },
+};
+
+/**
+ * A complete appeal letter — opening, body, closing, and signature — built
+ * from the anomaly's own type/explanation and the bill's real numbers, so
+ * it's never generic boilerplate disconnected from why the bill was
+ * flagged. Works for any Anomaly.type, not just the one bill that currently
+ * uses draft_appeal_email as its suggestedAction.
+ */
+export function draftAppealLetter(params: {
+  coordinatorName: string;
+  patientName: string;
+  providerName: string;
+  serviceDate: string;
+  billedAmount: number;
+  owe: number;
+  anomaly: Anomaly;
+}): string {
+  const { citation, ask } = APPEAL_ARGUMENTS[params.anomaly.type];
+  return [
+    "To Whom It May Concern:",
+    "",
+    `I am writing on behalf of ${params.patientName} to appeal the billing for the ${formatLongDate(
+      params.serviceDate
+    )} visit with ${params.providerName}, currently billed at ${formatMoney(
+      params.billedAmount
+    )} with a patient responsibility of ${formatMoney(params.owe)}.`,
+    "",
+    `${params.anomaly.explanation} ${citation}`,
+    "",
+    `I am requesting that you ${ask}.`,
+    "",
+    "Please let me know if you need any additional information to process this appeal.",
+    "",
+    "Sincerely,",
+    params.coordinatorName,
+  ].join("\n");
 }
 
 /**

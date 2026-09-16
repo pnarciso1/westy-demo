@@ -7,7 +7,15 @@ import { Card, CardKicker, CardTitle, CardBody, Tag, Button, Skeleton, AiSurface
 import type { Anomaly, Bill, CareTeamMember, Charge } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
-import { BillDetailStatusTag, billFinancials, billTitle, fallbackExplanation, formatMoney, formatShortDate } from "@/lib/bills";
+import {
+  BillDetailStatusTag,
+  billFinancials,
+  billTitle,
+  draftAppealLetter,
+  fallbackExplanation,
+  formatMoney,
+  formatShortDate,
+} from "@/lib/bills";
 
 type Flow =
   | { kind: "none" }
@@ -37,19 +45,28 @@ export default function BillDetail() {
   const [charges, setCharges] = useState<Charge[]>([]);
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [memberName, setMemberName] = useState("");
+  const [coordinatorName, setCoordinatorName] = useState("");
   const [flow, setFlow] = useState<Flow>({ kind: "none" });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const b = await mockWestyClient.getBill(billId);
-      const [c, person] = await Promise.all([mockWestyClient.getCharges(b.chargeIds), mockWestyClient.getPerson(b.personId)]);
-      const a = b.anomalyId ? await mockWestyClient.getAnomaly(b.anomalyId) : null;
+      const [c, person, currentUser] = await Promise.all([
+        mockWestyClient.getCharges(b.chargeIds),
+        mockWestyClient.getPerson(b.personId),
+        mockWestyClient.getCurrentUser(),
+      ]);
+      const [a, coordinator] = await Promise.all([
+        b.anomalyId ? mockWestyClient.getAnomaly(b.anomalyId) : Promise.resolve(null),
+        mockWestyClient.getPerson(currentUser.personId),
+      ]);
       if (cancelled) return;
       setBill(b);
       setCharges(c);
       setAnomaly(a);
       setMemberName(`${person.firstName} ${person.lastName}`);
+      setCoordinatorName(`${coordinator.firstName} ${coordinator.lastName}`);
     })();
     return () => {
       cancelled = true;
@@ -230,6 +247,15 @@ export default function BillDetail() {
               </Button>
             )}
 
+            {/* Always available on a flagged bill — disputing takes time, and
+                some people will just want it resolved regardless of what
+                Westy suggests. Never the primary action. */}
+            {bill.status === "flagged" && flow.kind === "none" && (
+              <Button variant="ghost" onClick={handlePay}>
+                Pay anyway
+              </Button>
+            )}
+
             {flow.kind === "dispute" && flow.stage === "working" && (
               <AiSurface>
                 <p style={{ margin: 0 }}>Filing a formal dispute with the payer…</p>
@@ -256,7 +282,7 @@ export default function BillDetail() {
                 <p style={{ margin: 0 }}>Drafting your appeal letter…</p>
               </AiSurface>
             )}
-            {flow.kind === "appeal" && (flow.stage === "drafted" || flow.stage === "sent") && (
+            {flow.kind === "appeal" && (flow.stage === "drafted" || flow.stage === "sent") && anomaly && (
               <AiSurface>
                 <div
                   style={{
@@ -264,13 +290,19 @@ export default function BillDetail() {
                     border: "1px solid var(--color-accent-300)",
                     padding: 12,
                     fontSize: 13,
-                    fontStyle: "italic",
+                    whiteSpace: "pre-wrap",
                     marginBottom: 10,
                   }}
                 >
-                  &ldquo;I am writing to appeal the billing for the {formatShortDate(charges[0]?.serviceDate ?? "")}{" "}
-                  visit. Per my plan&apos;s benefits, my responsibility should not exceed {formatMoney(insurancePaid ?? billed)}
-                  …&rdquo;
+                  {draftAppealLetter({
+                    coordinatorName,
+                    patientName: memberName,
+                    providerName: PROVIDER_DIRECTORY[charges[0]?.providerId] ?? "the provider",
+                    serviceDate: charges[0]?.serviceDate ?? "",
+                    billedAmount: billed,
+                    owe,
+                    anomaly,
+                  })}
                 </div>
                 {flow.stage === "drafted" ? (
                   <div style={{ display: "flex", gap: 8 }}>

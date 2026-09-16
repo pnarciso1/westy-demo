@@ -194,6 +194,11 @@ export const SEED_APPOINTMENTS: Appointment[] = [
   },
 ];
 
+/**
+ * One Anomaly per suggestedAction, so every action path on the bill detail
+ * page (dispute, call, draft-appeal — pay_now is the one left unseeded) has
+ * a real bill to demo, not just Maria's original dispute_with_payer case.
+ */
 export const SEED_ANOMALIES: Anomaly[] = [
   {
     id: "anomaly-maria-balance-bill",
@@ -205,6 +210,28 @@ export const SEED_ANOMALIES: Anomaly[] = [
     explanation:
       "This provider billed you directly for the difference between their charge and what your plan paid. Since they're in-network, this amount likely isn't something you owe.",
     suggestedAction: "dispute_with_payer",
+  },
+  {
+    id: "anomaly-david-coding-mismatch",
+    chargeIds: ["charge-david-coding"],
+    planContextId: "plan-ramirez",
+    accumulatorIds: ["accum-david-oop"],
+    type: "coding_mismatch",
+    severity: "review",
+    explanation:
+      "The billing code your endocrinologist's office submitted doesn't match the visit type, which caused your insurance to underpay this claim. This is a billing office error, not something you should pay out of pocket.",
+    suggestedAction: "call_provider",
+  },
+  {
+    id: "anomaly-sofia-oon-surprise",
+    chargeIds: ["charge-sofia-er-physician"],
+    planContextId: "plan-ramirez",
+    accumulatorIds: ["accum-sofia-oop"],
+    type: "out_of_network_surprise",
+    severity: "action_needed",
+    explanation:
+      "The physician group that treated Sofia in the ER billed this out-of-network, but federal surprise-billing protections require emergency care to be covered at in-network rates. This charge is very likely not something you owe.",
+    suggestedAction: "draft_appeal_email",
   },
 ];
 
@@ -246,6 +273,28 @@ export const SEED_CHARGES: Charge[] = [
     // No allowedAmount yet — insurance hasn't adjudicated this claim, which
     // is exactly why bill-david-checkup's status is still "pending".
   },
+  {
+    id: "charge-david-coding",
+    personId: "person-david",
+    providerId: "provider-endo",
+    serviceDate: "2026-09-01",
+    cptCode: "80053",
+    billedAmount: 460,
+    // Underpaid because the wrong CPT code was submitted — the fix is a
+    // phone call to the billing office, not a dispute with the payer.
+    allowedAmount: 90,
+  },
+  {
+    id: "charge-sofia-er-physician",
+    personId: "person-sofia",
+    providerId: "provider-er-attending",
+    serviceDate: "2026-08-02",
+    cptCode: "99285",
+    billedAmount: 680,
+    // Denied outright as out-of-network — the surprise-billing appeal is
+    // exactly what should get this reprocessed at the in-network rate.
+    allowedAmount: 0,
+  },
 ];
 
 /**
@@ -258,6 +307,7 @@ export const SEED_CHARGES: Charge[] = [
 export const PROVIDER_DIRECTORY: Record<string, string> = {
   "provider-pcp": "Riverside Family Medicine",
   "provider-er": "Riverside ER",
+  "provider-er-attending": "Coastal Emergency Physicians",
   "provider-ortho": "Riverside Orthopedics",
   "provider-endo": "Riverside Endocrine Associates",
   "provider-pediatrician": "Riverside Family Medicine",
@@ -283,6 +333,22 @@ export const SEED_BILLS: Bill[] = [
     personId: "person-david",
     chargeIds: ["charge-david-checkup"],
     status: "pending",
+  },
+  {
+    id: "bill-david-coding",
+    personId: "person-david",
+    chargeIds: ["charge-david-coding"],
+    anomalyId: "anomaly-david-coding-mismatch",
+    status: "flagged",
+    claimId: "claim-david-coding",
+  },
+  {
+    id: "bill-sofia-er-physician",
+    personId: "person-sofia",
+    chargeIds: ["charge-sofia-er-physician"],
+    anomalyId: "anomaly-sofia-oon-surprise",
+    status: "flagged",
+    claimId: "claim-sofia-er-physician",
   },
 ];
 
