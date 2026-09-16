@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   NavBar,
   Card,
@@ -8,46 +8,43 @@ import {
   CardTitle,
   CardBody,
   CardMeta,
-  Tag,
   Button,
-  Skeleton,
-  SectionLabel,
   AiSurface,
+  SectionLabel,
 } from "@westy/shared/ui";
-import type { DashboardSummary } from "@westy/shared/client";
-import { mockWestyClient } from "@/lib/mock";
 
-export default function Dashboard() {
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+const STEPS = [
+  {
+    number: "01",
+    title: "Understand coverage",
+    body: "Westy explains your plan and benefits in plain language, not insurance-speak.",
+  },
+  {
+    number: "02",
+    title: "Use what you're entitled to",
+    body: "Track HSA/FSA balances and benefit deadlines before they expire.",
+  },
+  {
+    number: "03",
+    title: "Pay with confidence",
+    body: "Westy catches billing errors and tells you exactly what you actually owe.",
+  },
+];
 
-  useEffect(() => {
-    let cancelled = false;
-    mockWestyClient.getCurrentUser().then((user) => {
-      mockWestyClient.getDashboard(user.personId).then((data) => {
-        if (!cancelled) setSummary(data);
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+// Mirrors lib/mock/seed.ts's Ramirez household, so this preview matches what
+// onboarding and the Dashboard actually show later.
+const HOUSEHOLD_PREVIEW = [
+  { name: "Maria Ramirez", role: "Coordinator" },
+  { name: "David Ramirez", role: "Spouse" },
+  { name: "Sofia Ramirez", role: "Child" },
+  { name: "Diego Ramirez-Nunez", role: "Child" },
+];
 
-  async function handleAcceptSuggestion(suggestionId: string) {
-    await mockWestyClient.acceptEpisodeSuggestion(suggestionId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
-  }
+export default function Home() {
+  const router = useRouter();
 
-  async function handleDismissSuggestion(suggestionId: string) {
-    await mockWestyClient.dismissEpisodeSuggestion(suggestionId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
-  }
-
-  async function handleCompleteTask(taskId: string) {
-    await mockWestyClient.completeTask(taskId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
+  function scrollToHowItWorks() {
+    document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
@@ -55,112 +52,119 @@ export default function Dashboard() {
       <NavBar
         brand="Westy"
         links={[
-          { label: "Dashboard", href: "#dashboard", active: true },
-          { label: "My Care Team", href: "#care-team" },
-          { label: "Bills", href: "#bills" },
-          { label: "Household", href: "#household" },
+          { label: "How it works", href: "#how-it-works" },
+          { label: "Log in", href: "/dashboard" },
         ]}
+        trailing={
+          <Button variant="primary" onClick={() => router.push("/onboarding")}>
+            Get started
+          </Button>
+        }
       />
-     <main style={{ padding: "var(--space-6)", maxWidth: 960, margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
-        {!summary ? (
-          <>
-            <Skeleton height={80} />
-            <Skeleton height={120} />
-            <Skeleton height={120} />
-          </>
-        ) : (
-          <>
-            <section>
-              <SectionLabel>Household</SectionLabel>
-              <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                {summary.members.map((person) => (
-                  <Card key={person.id} style={{ minWidth: 200 }}>
-                    <CardTitle>
-                      {person.firstName} {person.lastName}
-                    </CardTitle>
-                    <CardMeta>{person.relationshipToCoordinator ?? "member"}</CardMeta>
-                  </Card>
-                ))}
-              </div>
-            </section>
 
-            {summary.flaggedBills.length > 0 && (
-              <section>
-                <SectionLabel>Needs your attention</SectionLabel>
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                  {summary.flaggedBills.map((bill) => (
-                    <Card key={bill.id}>
-                      <div style={{ alignSelf: "flex-start" }}>
-                        <Tag variant="accent">Flagged bill</Tag>
-                      </div>
-                      <CardBody>
-                        This bill was flagged for review — likely something you don&apos;t owe.
-                      </CardBody>
-                      <div>
-                        <Button variant="primary">Review</Button>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
+      <main
+        style={{
+          maxWidth: 880,
+          margin: "0 auto",
+          padding: "var(--space-8) var(--space-4)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--space-8)",
+        }}
+      >
+        <section style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", maxWidth: 640 }}>
+          <SectionLabel>For the person who keeps it all straight</SectionLabel>
+          <h1>One place to understand, use, and pay for your family&apos;s healthcare.</h1>
+          <p>
+            Westy pulls together every bill, benefit, and provider for your household —
+            explains what your coverage actually means, helps you use what you&apos;re
+            entitled to before it expires, and tells you, in plain language, when
+            something needs your attention.
+          </p>
+          <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+            <Button variant="primary" onClick={() => router.push("/onboarding")}>
+              Get started free
+            </Button>
+            <Button variant="secondary" onClick={scrollToHowItWorks}>
+              See how it works
+            </Button>
+          </div>
+          <p className="text-muted" style={{ fontSize: 12, margin: 0 }}>
+            Free to start. Live in about 5 minutes.
+          </p>
+        </section>
 
-            {summary.highlightedEpisodes.length > 0 && (
-              <section>
-                <SectionLabel>Active care</SectionLabel>
-                <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                  {summary.highlightedEpisodes.map((episode) => (
-                    <Card key={episode.id} style={{ minWidth: 240 }}>
-                      <CardKicker>Episode</CardKicker>
-                      <CardTitle>{episode.title}</CardTitle>
-                      <CardMeta>
-                        {episode.appointmentIds.length} appointment
-                        {episode.appointmentIds.length === 1 ? "" : "s"} · {episode.documentIds.length} document
-                        {episode.documentIds.length === 1 ? "" : "s"}
-                      </CardMeta>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
+        <figure style={{ margin: 0, maxWidth: 520, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <AiSurface>
+            Your family still has $850 in FSA funds and 46 days left to use them — want
+            me to suggest ways to use it before it expires?
+          </AiSurface>
+          <AiSurface>
+            Sofia&apos;s ER bill looks off — your insurance paid less than your plan says
+            it should have. Want me to draft an appeal?
+          </AiSurface>
+          <figcaption>
+            This is what Westy sounds like everywhere in the app — and you&apos;ll always
+            know it&apos;s Westy talking, not your data.
+          </figcaption>
+        </figure>
 
-            {summary.openTasks.length > 0 && (
-              <section>
-                <SectionLabel>Open tasks</SectionLabel>
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-                  {summary.openTasks.map((task) => (
-                    <Card key={task.id} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                      <CardBody>{task.title}</CardBody>
-                      <Button variant="secondary" onClick={() => handleCompleteTask(task.id)}>
-                        Mark complete
-                      </Button>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
+        <section id="how-it-works" style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <SectionLabel>How Westy helps, step by step</SectionLabel>
+          <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+            {STEPS.map((step) => (
+              <Card key={step.number} style={{ flex: "1 1 200px", minWidth: 200 }}>
+                <CardKicker>{step.number}</CardKicker>
+                <CardTitle>{step.title}</CardTitle>
+                <CardBody>{step.body}</CardBody>
+              </Card>
+            ))}
+          </div>
+        </section>
 
-            {summary.pendingEpisodeSuggestions.length > 0 && (
-              <section>
-                <SectionLabel>Suggested for you</SectionLabel>
-                {summary.pendingEpisodeSuggestions.map((suggestion) => (
-                  <AiSurface key={suggestion.id}>
-                    We noticed a pattern that might be worth grouping as &quot;{suggestion.suggestedTitle}&quot;.
-                    <div style={{ display: "flex", gap: "var(--space-2)", marginTop: "var(--space-2)" }}>
-                      <Button variant="primary" onClick={() => handleAcceptSuggestion(suggestion.id)}>
-                        Group these
-                      </Button>
-                      <Button variant="ghost" onClick={() => handleDismissSuggestion(suggestion.id)}>
-                        Not now
-                      </Button>
-                    </div>
-                  </AiSurface>
-                ))}
-              </section>
-            )}
-          </>
-        )}
+        <section style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <SectionLabel>Everyone in your household, in one view</SectionLabel>
+          <p style={{ maxWidth: 560, margin: 0 }}>
+            Every family member gets their own profile — separate records, appointments,
+            and bills — all visible together in one shared household view.
+          </p>
+          <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+            {HOUSEHOLD_PREVIEW.map((member) => (
+              <Card key={member.name} style={{ flex: "1 1 180px", minWidth: 180 }}>
+                <CardTitle>{member.name}</CardTitle>
+                <CardMeta>{member.role}</CardMeta>
+              </Card>
+            ))}
+          </div>
+        </section>
       </main>
+
+      <section
+        style={{
+          background: "var(--color-text)",
+          color: "var(--color-bg)",
+          padding: "var(--space-8) var(--space-4)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "var(--space-4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ maxWidth: 640, margin: 0 }}>
+          Stop juggling folders, portals, and phone calls. Let Westy hold the whole
+          picture.
+        </h2>
+        <Button variant="primary" onClick={() => router.push("/onboarding")}>
+          Get started free
+        </Button>
+      </section>
+
+      <footer style={{ borderTop: "2px solid var(--color-divider)", padding: "var(--space-4)", textAlign: "center" }}>
+        <span className="text-muted" style={{ fontSize: 12 }}>
+          © 2026 Westy. Not a substitute for medical or insurance advice.
+        </span>
+      </footer>
     </>
   );
 }

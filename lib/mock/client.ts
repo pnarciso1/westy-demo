@@ -31,14 +31,15 @@ import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
 
 /**
- * The one scripted failure in the demo: Diego's pediatrician doesn't have a
- * real portal integration. Any provider_portal connector initiated for
- * Diego resolves to "error" every time — including on retry — which is
- * what makes the upload-fallback path the natural next move in the demo,
- * not a dead end the rep has to explain away.
+ * The one scripted failure in the demo: no provider_portal integration
+ * actually exists yet, for any provider, for anyone. Every provider_portal
+ * connector resolves to "error" — including on retry — which is what makes
+ * the upload-fallback path the natural next move in the demo, not a dead
+ * end the rep has to explain away. payer and hsa_fsa_card connectors always
+ * succeed.
  */
 function isScriptedFailure(input: { ownerPersonId: string; type: Connector["type"] }): boolean {
-  return input.ownerPersonId === "person-diego" && input.type === "provider_portal";
+  return input.type === "provider_portal";
 }
 
 function notFound(kind: string, id: string): never {
@@ -85,15 +86,28 @@ export class MockWestyClient implements WestyClient {
   }
 
   // ── Onboarding ───────────────────────────────────────────────────────
+  /**
+   * DEMO-ONLY BEHAVIOR — not representative of real production onboarding.
+   * Every onboarding run resets to the seeded Ramirez household, then
+   * overwrites the seeded coordinator (Maria's Person record) with whatever
+   * the rep types in Step 1, keeping her existing id. This means the
+   * household's episodes, bills, and appointments — all seeded against
+   * "person-maria" etc. — stay attached and visible on the Dashboard
+   * immediately after onboarding, instead of onboarding producing an empty,
+   * disconnected household. See `addFamilyMember` below for the same
+   * pattern applied to the other seeded family members.
+   */
   async startOnboarding(input: StartOnboardingInput): Promise<OnboardingSession> {
     await delay(400);
-    const personId = this.genId("person");
-    const userId = this.genId("user");
-    const householdId = this.genId("hh");
+    this.resetDemo();
+    const coordinator = this.state.people[0];
+    coordinator.firstName = input.firstName;
+    coordinator.lastName = input.lastName;
+    coordinator.dateOfBirth = input.dateOfBirth;
     const session: OnboardingSession = {
       id: this.genId("onboarding"),
-      userId,
-      householdId,
+      userId: this.state.user.id,
+      householdId: this.state.household.id,
       startedAt: new Date().toISOString(),
       steps: [
         { step: "account", status: "complete" },
@@ -101,11 +115,6 @@ export class MockWestyClient implements WestyClient {
         { step: "connect_or_upload", status: "pending", connectorIds: [], documentIds: [] },
       ],
     };
-    // Note: this demo doesn't persist the new user/household/coordinator
-    // Person into `this.state` — onboarding here is illustrated as its own
-    // flow, separate from the seeded Ramirez dashboard. See input for what
-    // a real implementation would do with firstName/lastName/dateOfBirth.
-    void input;
     this.state.onboardingSessions.set(session.id, session);
     return session;
   }
@@ -115,17 +124,48 @@ export class MockWestyClient implements WestyClient {
     return this.state.onboardingSessions.get(sessionId) ?? notFound("OnboardingSession", sessionId);
   }
 
+  /**
+   * DEMO-ONLY BEHAVIOR — not representative of real production onboarding.
+   * The first three family members entered during onboarding are matched by
+   * POSITION onto the seeded non-coordinator Ramirez members (David, then
+   * Sofia, then Diego) and overwrite their name/DOB in place, keeping their
+   * existing ids — this is what keeps their seeded episodes, bills, and
+   * appointments attached and visible on the Dashboard. A 4th+ family
+   * member (beyond the seeded household's 3 dependents) falls back to
+   * creating a genuinely new, disconnected Person record.
+   */
   async addFamilyMember(sessionId: string, input: AddFamilyMemberInput): Promise<OnboardingSession> {
     await delay(300);
     const session = this.state.onboardingSessions.get(sessionId) ?? notFound("OnboardingSession", sessionId);
-    const newPersonId = this.genId("person");
     const step = session.steps.find(
       (s): s is Extract<OnboardingStep, { step: "family_members" }> => s.step === "family_members"
     );
-    if (step) {
-      step.addedPersonIds = [...step.addedPersonIds, newPersonId];
+    const position = step ? step.addedPersonIds.length : 0;
+    const seededNonCoordinator = this.state.people.slice(1, 4);
+    let personId: string;
+    if (position < seededNonCoordinator.length) {
+      const person = seededNonCoordinator[position];
+      person.firstName = input.firstName;
+      person.lastName = input.lastName;
+      person.dateOfBirth = input.dateOfBirth;
+      personId = person.id;
+    } else {
+      const newPerson: Person = {
+        id: this.genId("person"),
+        householdId: this.state.household.id,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        dateOfBirth: input.dateOfBirth,
+        relationshipToCoordinator: input.relationshipToCoordinator,
+        financialAccess: "coordinator",
+        fhirPatientId: this.genId("fhir-patient"),
+      };
+      this.state.people.push(newPerson);
+      personId = newPerson.id;
     }
-    void input;
+    if (step) {
+      step.addedPersonIds = [...step.addedPersonIds, personId];
+    }
     return session;
   }
 
