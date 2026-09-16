@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { AppNav } from "@/components/AppNav";
 import {
-  NavBar,
   Card,
   CardKicker,
   CardTitle,
@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <>
-      <NavBar
+      <AppNav
         brand="Westy"
         links={[
           { label: "How it works", href: "#how-it-works" },

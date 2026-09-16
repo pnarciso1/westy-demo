@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style> a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); } </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html" aria-current="page">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:760px;margin:0 auto;padding:40px 40px 120px;">
+    <h1 style="font-size:28px;margin-bottom:4px;">Connections</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:32px;">Everything Westy pulls from automatically. Reconnect or disconnect anytime &mdash; nothing here is required.</p>
+
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">Insurance &amp; payer</div>
+    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ insOpacity }};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Anthem Blue Cross</div><div style="font-size:12px;opacity:0.55;">{{ insMeta }}</div></div>
+        <sc-if value="{{ insIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ insConnect }}">Connect</button></sc-if>
+        <sc-if value="{{ insConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+        <sc-if value="{{ insConnected }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ insDisconnect }}">Disconnect</button></sc-if>
+        <sc-if value="{{ insDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ insConnect }}">Reconnect</button></sc-if>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">Health records (PHR/EHR)</div>
+    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ recOpacity }};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Riverside Health patient records</div><div style="font-size:12px;opacity:0.55;">{{ recMeta }}</div></div>
+        <sc-if value="{{ recIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ recConnect }}">Connect</button></sc-if>
+        <sc-if value="{{ recConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+        <sc-if value="{{ recConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ recDisconnect }}">Disconnect</button></sc-if>
+        <sc-if value="{{ recDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ recConnect }}">Reconnect</button></sc-if>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">My Care Team</div>
+    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ provOpacity }};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Riverside Health provider portal</div><div style="font-size:12px;opacity:0.55;">{{ provMeta }}</div></div>
+        <sc-if value="{{ provIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Connect</button></sc-if>
+        <sc-if value="{{ provConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+        <sc-if value="{{ provConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ provDisconnect }}">Disconnect</button></sc-if>
+        <sc-if value="{{ provError }}" hint-placeholder-val="{{ true }}"><span class="tag tag-accent" style="margin-right:4px;">Needs attention</span><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Reconnect</button></sc-if>
+        <sc-if value="{{ provDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Reconnect</button></sc-if>
+      </div>
+      <sc-if value="{{ provError }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--color-divider);display:flex;align-items:center;gap:8px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+          <p style="margin:0;font-size:13px;">Their portal has been unreachable since Sep 9. Care team info is still current from your last sync &mdash; nothing's missing yet.</p>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">HSA card</div>
+    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ hsaOpacity }};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect width="20" height="14" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">HSA card &middot; &bull;&bull;&bull;&bull; 4471</div><div style="font-size:12px;opacity:0.55;">{{ hsaMeta }}</div></div>
+        <sc-if value="{{ hsaIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ hsaConnect }}">Connect</button></sc-if>
+        <sc-if value="{{ hsaConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+        <sc-if value="{{ hsaConnected }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ hsaDisconnect }}">Disconnect</button></sc-if>
+        <sc-if value="{{ hsaDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ hsaConnect }}">Reconnect</button></sc-if>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">FSA card</div>
+    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;opacity:{{ fsaOpacity }};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect width="20" height="14" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">FSA card</div><div style="font-size:12px;opacity:0.55;">{{ fsaMeta }}</div></div>
+        <sc-if value="{{ fsaIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ fsaConnect }}">Connect</button></sc-if>
+        <sc-if value="{{ fsaConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+        <sc-if value="{{ fsaConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ fsaDisconnect }}">Disconnect</button></sc-if>
+        <sc-if value="{{ fsaDisconnectedState }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ fsaConnect }}">Reconnect</button></sc-if>
+      </div>
+    </div>
+
+    <p style="font-size:11px;opacity:0.5;margin-top:24px;">Connected = active and syncing. Disconnected (dimmed) = you turned it off; reconnect anytime. Needs attention (red) = Westy couldn't reach it and will keep retrying.</p>
+    <a href="Westy-Onboarding.dc.html" style="font-size:13px;display:inline-block;margin-top:8px;">Add another connection from the setup flow &rarr;</a>
+
+    <div class="hr" style="margin-top:32px;"></div>
+    <h3 style="margin:24px 0 8px;">Your data</h3>
+    <p style="font-size:13px;opacity:0.6;margin-bottom:16px;">Download everything Westy has for your household &mdash; bills, documents, and care team info &mdash; as a single file.</p>
+
+    <sc-if value="{{ exportIdle }}" hint-placeholder-val="{{ true }}">
+      <button type="button" class="btn btn-secondary" onclick="{{ startExport }}">Request an export</button>
+    </sc-if>
+    <sc-if value="{{ exportPreparing }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;display:flex;align-items:center;gap:8px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        <p style="margin:0;font-size:13px;">Preparing your export&hellip; this usually takes a minute.</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{ exportReady }}" hint-placeholder-val="{{ false }}">
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Your export is ready</div><div style="font-size:12px;opacity:0.55;">Generated just now &middot; link valid for 24 hours</div></div>
+        <button type="button" class="btn btn-primary">Download</button>
+      </div>
+    </sc-if>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--color-divider);">
+      <div style="font-size:11px;opacity:0.5;margin-bottom:8px;">Earlier export</div>
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;opacity:0.7;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Export from Aug 1, 2026</div><div style="font-size:12px;opacity:0.55;">This download link has expired</div></div>
+        <button type="button" class="btn btn-secondary" onclick="{{ startExport }}">Request new export</button>
+      </div>
+    </div>
+  </main>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { insurance: 'connected', records: 'idle', providers: 'error', hsa: 'connected', fsa: 'disconnected', exportStage: 'idle' };
+
+  startExport() {
+    this.setState({ exportStage: 'preparing' });
+    setTimeout(() => this.setState({ exportStage: 'ready' }), 1600);
+  }
+
+  connect(key) {
+    this.setState({ [key]: 'connecting' });
+    setTimeout(() => this.setState({ [key]: 'connected' }), 1200);
+  }
+  disconnect(key) { this.setState({ [key]: 'disconnected' }); }
+
+  fields(prefix, key, connectedMeta) {
+    const s = this.state[key];
+    const opacity = s === 'disconnected' ? 0.55 : 1;
+    let meta = 'Not connected yet';
+    if (s === 'connecting') meta = 'Connecting…';
+    if (s === 'connected') meta = connectedMeta;
+    if (s === 'error') meta = 'Last synced Sep 9 · connection lost';
+    if (s === 'disconnected') meta = 'Turned off by you';
+    const out = {};
+    out[prefix + 'Opacity'] = opacity;
+    out[prefix + 'Meta'] = meta;
+    out[prefix + 'Idle'] = s === 'idle';
+    out[prefix + 'Connecting'] = s === 'connecting';
+    out[prefix + 'Connected'] = s === 'connected';
+    out[prefix + 'Error'] = s === 'error';
+    out[prefix + 'DisconnectedState'] = s === 'disconnected';
+    out[prefix + 'Connect'] = () => this.connect(key);
+    out[prefix + 'Disconnect'] = () => this.disconnect(key);
+    return out;
+  }
+
+  renderVals() {
+    return {
+      ...this.fields('ins', 'insurance', 'Connected · Synced today'),
+      ...this.fields('rec', 'records', 'Connected · Synced just now'),
+      ...this.fields('prov', 'providers', ''),
+      ...this.fields('hsa', 'hsa', 'Connected · $1,180 available'),
+      ...this.fields('fsa', 'fsa', 'Connected · $340 available'),
+      exportIdle: this.state.exportStage === 'idle',
+      exportPreparing: this.state.exportStage === 'preparing',
+      exportReady: this.state.exportStage === 'ready',
+      startExport: () => this.startExport()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

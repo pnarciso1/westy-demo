@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); }
+    @keyframes wz-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .wz-skel { background: var(--color-neutral-200); animation: wz-pulse 1.4s ease-in-out infinite; }
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html" aria-current="page">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:900px;margin:0 auto;padding:40px 40px 120px;">
+    <h1 style="font-size:28px;margin-bottom:4px;">Appointments</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:32px;">Everyone's visits, past and upcoming, in one list.</p>
+
+    <sc-if value="{{ pageLoading }}" hint-placeholder-val="{{ true }}">
+      <div class="wz-skel" style="height:60px;width:100%;margin-bottom:16px;"></div>
+      <div class="wz-skel" style="height:60px;width:100%;margin-bottom:8px;"></div>
+      <div class="wz-skel" style="height:60px;width:100%;margin-bottom:8px;"></div>
+      <div class="wz-skel" style="height:60px;width:100%;"></div>
+    </sc-if>
+    <sc-if value="{{ pageReady }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;margin-bottom:32px;display:flex;align-items:center;gap:10px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+      <p style="margin:0;font-size:13px;"><span style="font-weight:800;letter-spacing:0.06em;text-transform:uppercase;font-size:10px;color:var(--color-accent-700);">Westy&nbsp;&middot;&nbsp;</span>Emma's cast-removal follow-up was just booked with Dr. Francis &mdash; it's on the list below.</p>
+    </div>
+
+    <h3 style="margin:0 0 12px;">Upcoming</h3>
+    <div style="margin-bottom:36px;">
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">SEP</div><div style="font-size:20px;font-weight:800;">16</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Cast-removal follow-up</div><div style="font-size:12px;opacity:0.55;">Emma James &middot; Dr. Francis, orthopedist &middot; 2:00 PM</div></div>
+        <span style="display:inline-flex;align-items:center;gap:5px;background:var(--color-accent-100);border:1px solid var(--color-accent-300);color:var(--color-accent-700);font-size:11px;font-weight:800;letter-spacing:0.02em;padding:3px 10px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>Booked by Westy</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">SEP</div><div style="font-size:20px;font-weight:800;">29</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Well-child visit</div><div style="font-size:12px;opacity:0.55;">Leo James &middot; Dr. Patel, pediatrician &middot; 9:15 AM</div></div>
+        <span class="tag tag-neutral">Scheduled</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">OCT</div><div style="font-size:20px;font-weight:800;">6</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Annual physical</div><div style="font-size:12px;opacity:0.55;">Maria James &middot; Dr. Whitfield, primary care &middot; 11:00 AM</div></div>
+        <span class="tag tag-neutral">Scheduled</span>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 12px;">Past</h3>
+    <div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">AUG</div><div style="font-size:20px;font-weight:800;opacity:0.6;">4</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Cast placed</div><div style="font-size:12px;opacity:0.55;">Emma James &middot; Dr. Francis, orthopedist</div></div>
+        <a href="Westy-Episode.dc.html" style="font-size:12px;text-decoration:none;">View episode &rarr;</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">AUG</div><div style="font-size:20px;font-weight:800;opacity:0.6;">3</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">ER visit &mdash; broken arm</div><div style="font-size:12px;opacity:0.55;">Emma James &middot; Riverside Hospital</div></div>
+        <a href="Westy-Episode.dc.html" style="font-size:12px;text-decoration:none;">View episode &rarr;</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">SEP</div><div style="font-size:20px;font-weight:800;opacity:0.6;">4</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Pediatric visit</div><div style="font-size:12px;opacity:0.55;">Leo James &middot; Dr. Patel, pediatrician</div></div>
+        <span class="tag tag-neutral">Completed</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">JUL</div><div style="font-size:20px;font-weight:800;opacity:0.6;">22</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Annual physical</div><div style="font-size:12px;opacity:0.55;">Maria James &middot; Dr. Whitfield, primary care</div></div>
+        <span class="tag tag-neutral">Completed</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">JUN</div><div style="font-size:20px;font-weight:800;opacity:0.6;">14</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Blood panel</div><div style="font-size:12px;opacity:0.55;">Dave James &middot; Dr. Whitfield, primary care</div></div>
+        <span class="tag tag-neutral">Completed</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">AUG</div><div style="font-size:20px;font-weight:800;opacity:0.6;">28</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Well-child visit</div><div style="font-size:12px;opacity:0.55;">Leo James &middot; Dr. Patel, pediatrician</div></div>
+        <span class="tag tag-outline">Cancelled</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:52px;flex:none;"><div style="font-size:11px;opacity:0.55;">AUG</div><div style="font-size:20px;font-weight:800;opacity:0.6;">12</div></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Annual physical</div><div style="font-size:12px;opacity:0.55;">Dave James &middot; Dr. Whitfield, primary care</div></div>
+        <span class="tag tag-accent">No-show</span>
+      </div>
+    </div>
+    </sc-if>
+  </main>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { pageLoading: true };
+  componentDidMount() { setTimeout(() => this.setState({ pageLoading: false }), 700); }
+  renderVals() {
+    return { pageLoading: this.state.pageLoading, pageReady: !this.state.pageLoading };
+  }
+}
+
+</script>
+</body>
+</html>

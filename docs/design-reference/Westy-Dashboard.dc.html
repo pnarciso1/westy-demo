@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); }
+    @keyframes wz-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .wz-skel { background: var(--color-neutral-200); animation: wz-pulse 1.4s ease-in-out infinite; }
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html" aria-current="page">Home</a>
+    <a href="Westy-Household.dc.html">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:40px 40px 120px;display:grid;grid-template-columns:2fr 1fr;gap:40px;">
+    <div>
+      <h1 style="font-size:28px;margin-bottom:4px;">Good morning, Maria</h1>
+      <p style="opacity:0.65;font-size:14px;margin-bottom:28px;">Here's where things stand for the James household.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:36px;">
+        <div class="card">
+          <div class="card-kicker">Open bills</div>
+          <div class="card-title">$412 owed</div>
+          <div style="height:6px;background:var(--color-neutral-200);margin-top:4px;"><div style="height:100%;width:34%;background:var(--color-accent);"></div></div>
+          <p class="card-body"><a href="Westy-Bills.dc.html" style="font-size:12px;">See all bills &rarr;</a></p>
+        </div>
+        <div class="card">
+          <div class="card-kicker">HSA balance</div>
+          <sc-if value="{{ hsaReady }}" hint-placeholder-val="{{ false }}">
+            <div class="card-title">$1,180 available</div>
+            <div style="height:6px;background:var(--color-neutral-200);margin-top:4px;"><div style="height:100%;width:58%;background:var(--color-text);"></div></div>
+            <p class="card-body">$820 used of $2,000 this year</p>
+          </sc-if>
+          <sc-if value="{{ hsaChecking }}" hint-placeholder-val="{{ false }}">
+            <div class="wz-skel" style="height:22px;width:70%;margin:2px 0 8px;"></div>
+            <div class="wz-skel" style="height:6px;width:100%;margin-bottom:8px;"></div>
+            <p class="card-body" style="opacity:0.6;">Checking your HSA balance&hellip;</p>
+          </sc-if>
+          <sc-if value="{{ hsaPending }}" hint-placeholder-val="{{ true }}">
+            <div class="wz-skel" style="height:22px;width:70%;margin:2px 0 8px;"></div>
+            <div class="wz-skel" style="height:6px;width:100%;margin-bottom:8px;"></div>
+            <p class="card-body" style="opacity:0.7;">Still syncing your HSA card &mdash; showing everything else in the meantime.</p>
+            <button type="button" class="btn btn-ghost" style="padding-left:0;" onclick="{{ refreshHsa }}">Refresh</button>
+          </sc-if>
+        </div>
+        <div class="card">
+          <div class="card-kicker">Total household spend</div>
+          <div class="card-title">$1,550 this year</div>
+          <div style="height:6px;background:var(--color-neutral-200);margin-top:4px;display:flex;gap:2px;">
+            <div style="height:100%;width:46%;background:var(--color-accent-700);"></div>
+            <div style="height:100%;width:19%;background:var(--color-accent-500);"></div>
+            <div style="height:100%;width:25%;background:var(--color-accent-300);"></div>
+            <div style="height:100%;width:10%;background:var(--color-neutral-400);"></div>
+          </div>
+          <p class="card-body"><a href="Westy-Household.dc.html" style="font-size:12px;">See spend by family member &rarr;</a></p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="margin:0;">Needs your attention</h3>
+      </div>
+      <a href="Westy-BillDetail.dc.html" style="text-decoration:none;color:inherit;display:block;">
+        <div class="card elev-sm" style="flex-direction:row;align-items:center;gap:14px;margin-bottom:12px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;">Riverside Hospital ER bill &mdash; insurance paid less than expected</div>
+            <div style="font-size:12px;opacity:0.55;">Emma James &middot; $340 gap from expected coverage</div>
+          </div>
+          <span class="tag tag-accent">Needs attention</span>
+        </div>
+      </a>
+
+      <h3 style="margin:32px 0 12px;">Open tasks</h3>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+          <div style="width:20px;height:20px;border:1.5px solid var(--color-divider);flex:none;"></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;">Review Emma's flagged ER bill</div>
+            <div style="font-size:12px;opacity:0.55;">Emma James &middot; Due this week</div>
+            <div style="font-size:11px;opacity:0.55;display:flex;align-items:center;gap:4px;margin-top:3px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>Created by Westy &mdash; this bill was flagged as underpaid</div>
+          </div>
+          <span class="tag tag-accent">Needs attention</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+          <div style="width:20px;height:20px;border:1.5px solid var(--color-divider);flex:none;"></div>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Pay Riverside Pediatrics copay</div><div style="font-size:12px;opacity:0.55;">Leo James &middot; Due Sep 20</div></div>
+          <span class="tag tag-neutral">Scheduled</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--color-divider);">
+          <div style="width:20px;height:20px;border:1.5px solid var(--color-divider);flex:none;"></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;">Schedule Emma's cast-removal follow-up</div>
+            <div style="font-size:12px;opacity:0.55;">Emma James &middot; Dr. Francis</div>
+            <div style="font-size:11px;opacity:0.5;margin-top:3px;">Added by Maria</div>
+          </div>
+          <span class="tag tag-outline">In progress</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-ghost" style="margin-top:8px;" onclick="{{ toggleCompleted }}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        2 completed this month
+      </button>
+      <sc-if value="{{ showCompleted }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:8px;">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);opacity:0.55;">
+            <div style="width:20px;height:20px;background:var(--color-text);color:var(--color-bg);flex:none;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:600;text-decoration:line-through;">Upload Emma's ER bill</div><div style="font-size:12px;">Emma James &middot; Done Aug 9</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);opacity:0.55;">
+            <div style="width:20px;height:20px;background:var(--color-text);color:var(--color-bg);flex:none;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:600;text-decoration:line-through;">Confirm Leo's copay amount</div><div style="font-size:12px;">Leo James &middot; Done Sep 6</div></div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div>
+      <h3 style="margin:0 0 12px;">What's new</h3>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <sc-if value="{{ showSuggestion }}" hint-placeholder-val="{{ true }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy suggests</span>
+              <span style="font-size:11px;opacity:0.5;margin-left:auto;">Today</span>
+            </div>
+            <p style="margin:0 0 10px;font-size:13px;">Emma's ER visit, cast placement, and follow-up look related. Want me to group them into one episode so it's easier to track?</p>
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn btn-secondary" onclick="{{ dismissSuggestion }}">Dismiss</button>
+              <button type="button" class="btn btn-primary" onclick="{{ acceptSuggestion }}">Group into an episode</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showAccepted }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-surface);padding:14px;">
+            <p style="margin:0;font-size:13px;">Done &mdash; grouped into Emma's <a href="Westy-Episode.dc.html">broken arm episode</a>.</p>
+          </div>
+        </sc-if>
+        <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+            <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span>
+            <span style="font-size:11px;opacity:0.5;margin-left:auto;">Today</span>
+          </div>
+          <p style="margin:0;font-size:13px;">I compared Emma's ER bill to your plan &mdash; insurance paid $340 less than it should have. Want to see why?</p>
+        </div>
+        <div style="background:var(--color-surface);padding:14px;">
+          <div style="font-size:11px;opacity:0.5;margin-bottom:4px;">Yesterday</div>
+          <p style="margin:0;font-size:13px;">New EOB received from Riverside Hospital for Emma's ER visit.</p>
+        </div>
+        <div style="background:var(--color-surface);padding:14px;">
+          <div style="font-size:11px;opacity:0.5;margin-bottom:4px;">Sep 8</div>
+          <p style="margin:0;font-size:13px;">Dr. Francis's office added a cast-removal follow-up to Emma's care team timeline.</p>
+        </div>
+        <div style="background:var(--color-surface);padding:14px;">
+          <div style="font-size:11px;opacity:0.5;margin-bottom:4px;">Sep 4</div>
+          <p style="margin:0;font-size:13px;">Leo's pediatric visit summary was added to his documents.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { showCompleted: false, suggestion: 'pending', hsaSync: 'pending' };
+  refreshHsa() {
+    this.setState({ hsaSync: 'checking' });
+    setTimeout(() => this.setState({ hsaSync: 'ready' }), 1100);
+  }
+  renderVals() {
+    return {
+      hsaPending: this.state.hsaSync === 'pending',
+      hsaChecking: this.state.hsaSync === 'checking',
+      hsaReady: this.state.hsaSync === 'ready',
+      refreshHsa: () => this.refreshHsa(),
+      showCompleted: this.state.showCompleted,
+      toggleCompleted: () => this.setState(s => ({ showCompleted: !s.showCompleted })),
+      showSuggestion: this.state.suggestion === 'pending',
+      showAccepted: this.state.suggestion === 'accepted',
+      dismissSuggestion: () => this.setState({ suggestion: 'dismissed' }),
+      acceptSuggestion: () => this.setState({ suggestion: 'accepted' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style> a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); } </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Homepage.dc.html" style="margin-left:auto;font-size:13px;">Exit to homepage</a>
+  </nav>
+
+  <main style="max-width:560px;margin:0 auto;padding:56px 24px 96px;">
+
+    <sc-if value="{{ showSteps }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <div style="height:3px;flex:1;background:{{ bar1 }};"></div>
+        <div style="height:3px;flex:1;background:{{ bar2 }};"></div>
+        <div style="height:3px;flex:1;background:{{ bar3 }};"></div>
+      </div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:24px;">Step {{ stepNum }} of 3 &middot; live in about 5 minutes</div>
+    </sc-if>
+
+    <!-- STEP 0: account -->
+    <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+      <h1 style="font-size:26px;margin-bottom:6px;">Let's create your account</h1>
+      <p style="opacity:0.65;font-size:14px;margin-bottom:24px;">You'll be the coordinator for your household &mdash; you can add family members next.</p>
+      <button type="button" class="btn btn-secondary btn-block" style="margin-bottom:16px;" onclick="{{ goStep1 }}">
+        <svg width="15" height="15" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/></svg>
+        Continue with Google<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin:8px 0 20px;">
+        <div style="flex:1;height:1px;background:var(--color-divider);"></div><span style="font-size:11px;opacity:0.5;">or with email</span><div style="flex:1;height:1px;background:var(--color-divider);"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="field"><label>First name</label><input class="input" placeholder="Maria" /></div>
+        <div class="field"><label>Last name</label><input class="input" placeholder="James" /></div>
+      </div>
+      <div class="field" style="margin-bottom:12px;"><label>Date of birth</label><input class="input" type="date" /></div>
+      <div class="field" style="margin-bottom:12px;"><label>Email</label><input class="input" type="email" placeholder="maria@email.com" /></div>
+      <div class="field" style="margin-bottom:20px;"><label>Password</label><input class="input" type="password" placeholder="At least 8 characters" /></div>
+      <button type="button" class="btn btn-primary btn-block" onclick="{{ goStep1 }}">Create account<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </sc-if>
+
+    <!-- STEP 1: family -->
+    <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-size:26px;margin-bottom:6px;">Who else is in your household?</h1>
+      <p style="opacity:0.65;font-size:14px;margin-bottom:24px;">Add anyone whose care and bills you'll be tracking. You can always add more later.</p>
+
+      <sc-for list="{{ family }}" as="m" hint-placeholder-count="1">
+        <div style="border:1px solid var(--color-divider);padding:16px;margin-bottom:12px;position:relative;">
+          <sc-if value="{{ m.canRemove }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onclick="{{ m.remove }}" aria-label="Remove" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;opacity:0.5;color:var(--color-text);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="field"><label>First name</label><input class="input" placeholder="First name" /></div>
+            <div class="field"><label>Last name</label><input class="input" placeholder="James" /></div>
+          </div>
+          <div class="field"><label>Date of birth</label><input class="input" type="date" /></div>
+        </div>
+      </sc-for>
+
+      <button type="button" class="btn btn-ghost" style="margin-bottom:24px;" onclick="{{ addMember }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add another family member</button>
+
+      <div style="display:flex;gap:12px;">
+        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="{{ goStep0 }}">Back</button>
+        <button type="button" class="btn btn-primary" style="flex:2;justify-content:center;" onclick="{{ goStep2 }}">Continue<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </sc-if>
+
+    <!-- STEP 2: connect or upload -->
+    <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;">
+        <h1 style="font-size:26px;margin:0;">Connect or upload &mdash; whatever's easiest</h1>
+      </div>
+      <p style="opacity:0.65;font-size:14px;margin-bottom:28px;">Both are optional and don't depend on each other. Do one, both, or skip entirely for now.</p>
+
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">Connect</div>
+
+      <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:600;">Insurance / payer</div>
+        <sc-if value="{{ insuranceConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Connected</span></sc-if>
+        <sc-if value="{{ insuranceIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ connectInsurance }}">Connect</button></sc-if>
+      </div>
+
+      <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect width="20" height="14" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:600;">HSA / FSA card</div>
+        <sc-if value="{{ hsaConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Connected</span></sc-if>
+        <sc-if value="{{ hsaIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ connectHsa }}">Connect</button></sc-if>
+      </div>
+
+      <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
+          <div style="flex:1;font-size:14px;font-weight:600;">My Care Team / providers</div>
+          <sc-if value="{{ providersIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ connectProviders }}">Connect</button></sc-if>
+          <sc-if value="{{ providersConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+          <sc-if value="{{ providersFailed }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent">Couldn't connect</span></sc-if>
+        </div>
+        <sc-if value="{{ providersFailed }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--color-divider);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span>
+            </div>
+            <p style="font-size:13px;margin:0 0 10px;">Your care team's portal isn't responding right now &mdash; that happens sometimes. No problem: try again, or just upload a recent bill and I'll get your care team from that instead.</p>
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn btn-secondary" onclick="{{ connectProviders }}">Try again</button>
+              <button type="button" class="btn btn-primary" onclick="{{ useFallback }}">Upload a bill instead</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin:28px 0 10px;">Upload</div>
+
+      <sc-if value="{{ showFallbackBanner }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:12px 14px;margin-bottom:10px;font-size:13px;">Good call &mdash; a provider bill below works just as well. Upload one whenever you're ready.</div>
+      </sc-if>
+
+      <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:600;">Insurance Benefit Summary</div>
+        <sc-if value="{{ benefitUploaded }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Uploaded</span></sc-if>
+        <sc-if value="{{ benefitIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ uploadBenefit }}">Upload</button></sc-if>
+      </div>
+      <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:600;">EOBs</div>
+        <sc-if value="{{ eobUploaded }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Uploaded</span></sc-if>
+        <sc-if value="{{ eobIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ uploadEob }}">Upload</button></sc-if>
+      </div>
+      <div style="border:{{ billsBorder }};padding:14px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+        <div style="flex:1;font-size:14px;font-weight:600;">Provider bills</div>
+        <sc-if value="{{ billsUploaded }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Uploaded</span></sc-if>
+        <sc-if value="{{ billsIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ uploadBills }}">Upload</button></sc-if>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="{{ goStep1 }}">Back</button>
+        <button type="button" class="btn btn-ghost" onclick="{{ goStep3 }}">Skip for now</button>
+        <button type="button" class="btn btn-primary" style="flex:2;justify-content:center;" onclick="{{ goStep3 }}">Continue<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </sc-if>
+
+    <!-- STEP 3: congrats -->
+    <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:left;">
+        <div style="width:48px;height:48px;background:var(--color-accent);color:var(--color-bg);display:flex;align-items:center;justify-content:center;margin-bottom:20px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></div>
+        <h1 style="font-size:28px;margin-bottom:8px;">Congratulations &mdash; you're all set!</h1>
+        <p style="opacity:0.7;font-size:15px;margin-bottom:12px;">Your household is set up in Westy. As bills and documents come in, Westy will keep everything organized and flag anything that needs a second look.</p>
+        <p style="opacity:0.7;font-size:14px;margin-bottom:28px;">{{ recap }}</p>
+        <button type="button" class="btn btn-primary btn-block" onclick="{{ goDashboard }}">Go to your dashboard<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    step: 0,
+    family: [{ id: 1 }],
+    nextId: 2,
+    connectors: { insurance: 'idle', hsa: 'idle', providers: 'idle' },
+    uploads: { benefit: 'idle', eob: 'idle', bills: 'idle' },
+    fallbackNotice: false
+  };
+
+  addMember() {
+    this.setState(s => ({ family: [...s.family, { id: s.nextId }], nextId: s.nextId + 1 }));
+  }
+  removeMember(id) {
+    this.setState(s => ({ family: s.family.filter(m => m.id !== id) }));
+  }
+  connectProviders() {
+    this.setState(s => ({ connectors: { ...s.connectors, providers: 'connecting' } }));
+    setTimeout(() => this.setState(s => ({ connectors: { ...s.connectors, providers: 'failed' } })), 1200);
+  }
+  useFallback() {
+    this.setState({ fallbackNotice: true });
+  }
+  recapText() {
+    const s = this.state;
+    const connected = Object.values(s.connectors).some(v => v === 'connected');
+    const uploaded = Object.values(s.uploads).some(v => v === 'uploaded');
+    if (connected && uploaded) return "You've connected an account and uploaded a document — Westy already has a head start on your household.";
+    if (connected) return "You've connected an account — Westy will start pulling in bills and documents automatically.";
+    if (uploaded) return "You've uploaded a document to get started — connect an account anytime from Connections for automatic updates.";
+    if (s.fallbackNotice) return "No worries about the care team connection — upload a bill anytime and Westy will pick up your providers from it.";
+    return "You skipped connecting and uploading for now — that's fine. Do it anytime from Connections, or just ask Westy.";
+  }
+
+  renderVals() {
+    const s = this.state;
+    const bar = (n) => s.step >= n ? 'var(--color-accent)' : 'var(--color-neutral-200)';
+    const family = s.family.map(m => ({ ...m, canRemove: s.family.length > 1, remove: () => this.removeMember(m.id) }));
+    return {
+      showSteps: s.step <= 2,
+      stepNum: s.step + 1,
+      bar1: bar(0), bar2: bar(1), bar3: bar(2),
+      isStep0: s.step === 0, isStep1: s.step === 1, isStep2: s.step === 2, isStep3: s.step === 3,
+      goStep0: () => this.setState({ step: 0 }),
+      goStep1: () => this.setState({ step: 1 }),
+      goStep2: () => this.setState({ step: 2 }),
+      goStep3: () => this.setState({ step: 3 }),
+      goDashboard: () => { location.href = 'Westy-Dashboard.dc.html'; },
+      family,
+      addMember: () => this.addMember(),
+      insuranceIdle: s.connectors.insurance === 'idle', insuranceConnected: s.connectors.insurance === 'connected',
+      connectInsurance: () => this.setState(st => ({ connectors: { ...st.connectors, insurance: 'connected' } })),
+      hsaIdle: s.connectors.hsa === 'idle', hsaConnected: s.connectors.hsa === 'connected',
+      connectHsa: () => this.setState(st => ({ connectors: { ...st.connectors, hsa: 'connected' } })),
+      providersIdle: s.connectors.providers === 'idle',
+      providersConnecting: s.connectors.providers === 'connecting',
+      providersFailed: s.connectors.providers === 'failed',
+      connectProviders: () => this.connectProviders(),
+      useFallback: () => this.useFallback(),
+      showFallbackBanner: s.fallbackNotice,
+      benefitIdle: s.uploads.benefit === 'idle', benefitUploaded: s.uploads.benefit === 'uploaded',
+      uploadBenefit: () => this.setState(st => ({ uploads: { ...st.uploads, benefit: 'uploaded' } })),
+      eobIdle: s.uploads.eob === 'idle', eobUploaded: s.uploads.eob === 'uploaded',
+      uploadEob: () => this.setState(st => ({ uploads: { ...st.uploads, eob: 'uploaded' } })),
+      billsIdle: s.uploads.bills === 'idle', billsUploaded: s.uploads.bills === 'uploaded',
+      uploadBills: () => this.setState(st => ({ uploads: { ...st.uploads, bills: 'uploaded' } })),
+      billsBorder: s.fallbackNotice ? '2px solid var(--color-accent)' : '1px solid var(--color-divider)',
+      recap: this.recapText()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

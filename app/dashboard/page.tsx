@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AppNav } from "@/components/AppNav";
 import {
-  NavBar,
   Card,
   CardKicker,
   CardTitle,
@@ -15,49 +16,54 @@ import {
   AiSurface,
 } from "@westy/shared/ui";
 import type { DashboardSummary } from "@westy/shared/client";
-import { mockWestyClient } from "@/lib/mock";
+import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
+import { billTitle } from "@/lib/bills";
 
 export default function Dashboard() {
+  const router = useRouter();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [flaggedBillTitles, setFlaggedBillTitles] = useState<Record<string, string>>({});
+
+  async function loadDashboard() {
+    const user = await mockWestyClient.getCurrentUser();
+    const data = await mockWestyClient.getDashboard(user.personId);
+    setSummary(data);
+    const titles = await Promise.all(
+      data.flaggedBills.map(async (bill) => {
+        const charges = await mockWestyClient.getCharges(bill.chargeIds);
+        return [bill.id, billTitle(charges, PROVIDER_DIRECTORY)] as const;
+      })
+    );
+    setFlaggedBillTitles(Object.fromEntries(titles));
+  }
 
   useEffect(() => {
-    let cancelled = false;
-    mockWestyClient.getCurrentUser().then((user) => {
-      mockWestyClient.getDashboard(user.personId).then((data) => {
-        if (!cancelled) setSummary(data);
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
+    loadDashboard();
   }, []);
 
   async function handleAcceptSuggestion(suggestionId: string) {
     await mockWestyClient.acceptEpisodeSuggestion(suggestionId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
+    await loadDashboard();
   }
 
   async function handleDismissSuggestion(suggestionId: string) {
     await mockWestyClient.dismissEpisodeSuggestion(suggestionId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
+    await loadDashboard();
   }
 
   async function handleCompleteTask(taskId: string) {
     await mockWestyClient.completeTask(taskId);
-    const user = await mockWestyClient.getCurrentUser();
-    setSummary(await mockWestyClient.getDashboard(user.personId));
+    await loadDashboard();
   }
 
   return (
     <>
-      <NavBar
+      <AppNav
         brand="Westy"
         links={[
           { label: "Dashboard", href: "#dashboard", active: true },
           { label: "My Care Team", href: "#care-team" },
-          { label: "Bills", href: "#bills" },
+          { label: "Bills", href: "/bills" },
           { label: "Household", href: "#household" },
         ]}
       />
@@ -88,19 +94,27 @@ export default function Dashboard() {
               <section>
                 <SectionLabel>Needs your attention</SectionLabel>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                  {summary.flaggedBills.map((bill) => (
-                    <Card key={bill.id}>
-                      <div style={{ alignSelf: "flex-start" }}>
-                        <Tag variant="accent">Flagged bill</Tag>
-                      </div>
-                      <CardBody>
-                        This bill was flagged for review — likely something you don&apos;t owe.
-                      </CardBody>
-                      <div>
-                        <Button variant="primary">Review</Button>
-                      </div>
-                    </Card>
-                  ))}
+                  {summary.flaggedBills.map((bill) => {
+                    const member = summary.members.find((p) => p.id === bill.personId);
+                    const title = flaggedBillTitles[bill.id] ?? "This bill";
+                    return (
+                      <Card key={bill.id}>
+                        <div style={{ alignSelf: "flex-start" }}>
+                          <Tag variant="accent">Flagged bill</Tag>
+                        </div>
+                        <CardBody>
+                          {title}
+                          {member ? ` for ${member.firstName} ${member.lastName}` : ""} was flagged for review —
+                          likely something you don&apos;t owe.
+                        </CardBody>
+                        <div>
+                          <Button variant="primary" onClick={() => router.push(`/bills/${bill.id}`)}>
+                            Review
+                          </Button>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </section>
             )}

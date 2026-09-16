@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style> a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); } </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html" aria-current="page">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <section style="max-width:1080px;margin:0 auto;padding:40px 40px 0;">
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.5;margin-bottom:8px;">Floating overlay &mdash; available from every screen in the app</div>
+    <div style="position:relative;height:420px;background:var(--color-surface);border:1px solid var(--color-divider);overflow:hidden;">
+      <div style="padding:24px;opacity:0.35;filter:blur(0.3px);">
+        <div style="height:14px;width:180px;background:var(--color-neutral-400);margin-bottom:16px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="height:64px;background:var(--color-neutral-300);"></div>
+          <div style="height:64px;background:var(--color-neutral-300);"></div>
+        </div>
+        <div style="height:12px;width:220px;background:var(--color-neutral-300);margin:20px 0 10px;"></div>
+        <div style="height:40px;background:var(--color-neutral-300);margin-bottom:8px;"></div>
+        <div style="height:40px;background:var(--color-neutral-300);"></div>
+      </div>
+      <div style="position:absolute;bottom:20px;right:20px;width:320px;background:var(--color-bg);border:1px solid var(--color-divider);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:2px solid var(--color-divider);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+          <span style="font-family:var(--font-heading);font-weight:800;font-size:14px;">Ask Westy</span>
+          <button type="button" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--color-text);opacity:0.5;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:10px 12px;font-size:13px;">Hi Maria &mdash; I noticed Emma's ER bill looks off. Want me to explain?</div>
+          <div style="align-self:flex-end;background:var(--color-surface);padding:10px 12px;font-size:13px;max-width:80%;">Yes, what's going on?</div>
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:10px 12px;font-size:13px;">Insurance paid $340 less than your plan should cover. I can draft an appeal &mdash; want me to?</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px;border-top:1px solid var(--color-divider);">
+          <input class="input" placeholder="Ask Westy anything&hellip;" disabled />
+          <button type="button" class="btn btn-primary btn-icon" aria-label="Send"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:820px;margin:0 auto;padding:56px 40px 96px;">
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.5;margin-bottom:8px;">Full-page Ask Westy</div>
+    <h1 style="font-size:26px;margin-bottom:6px;">Ask Westy</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:24px;">Ask about a bill, a family member's care, or what's on your plate this week.</p>
+
+    <div style="border:1px solid var(--color-divider);min-height:360px;display:flex;flex-direction:column;">
+      <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:12px 14px;max-width:80%;font-size:14px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg><span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span></div>
+          Hi Maria. Ask me anything about your family's bills, care team, or tasks &mdash; or try one of the questions below.
+        </div>
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="0">
+          <sc-if value="{{ m.fromWesty }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:12px 14px;max-width:80%;font-size:14px;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg><span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span></div>
+              {{ m.text }}
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.fromUser }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:flex-end;background:var(--color-surface);padding:12px 14px;max-width:80%;font-size:14px;">{{ m.text }}</div>
+          </sc-if>
+        </sc-for>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="tag tag-outline" style="cursor:pointer;border-radius:0;" onclick="{{ askBill }}">Why was Emma's ER bill flagged?</button>
+          <button type="button" class="tag tag-outline" style="cursor:pointer;border-radius:0;" onclick="{{ askCareTeam }}">Who's on Dave's care team?</button>
+          <button type="button" class="tag tag-outline" style="cursor:pointer;border-radius:0;" onclick="{{ askTasks }}">What tasks are open this week?</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input class="input" placeholder="Type a question for Westy&hellip;" disabled />
+          <button type="button" class="btn btn-primary btn-icon" aria-label="Send"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { messages: [] };
+
+  answers = {
+    bill: { q: "Why was Emma's ER bill flagged?", a: "Insurance paid $340 less than your plan should have covered for an in-network ER visit — it looks like the claim was processed at the wrong benefit tier. I can draft an appeal for you to review." },
+    care: { q: "Who's on Dave's care team?", a: "Dave sees Dr. Whitfield as his primary care physician. No specialists on file yet — want me to help add one?" },
+    tasks: { q: "What tasks are open this week?", a: "Two things: reviewing Emma's flagged ER bill, and Leo's Riverside Pediatrics copay is due Sep 20. Everything else is on track." }
+  };
+
+  ask(key) {
+    const entry = this.answers[key];
+    this.setState(s => ({ messages: [...s.messages, { fromUser: true, text: entry.q }, { fromWesty: true, text: entry.a }] }));
+  }
+
+  renderVals() {
+    return {
+      messages: this.state.messages,
+      askBill: () => this.ask('bill'),
+      askCareTeam: () => this.ask('care'),
+      askTasks: () => this.ask('tasks')
+    };
+  }
+}
+
+</script>
+</body>
+</html>

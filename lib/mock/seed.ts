@@ -7,6 +7,7 @@ import type {
   Appointment,
   Bill,
   Anomaly,
+  Charge,
   Document as WestyDocument,
   CareTeamMember,
   Connector,
@@ -207,6 +208,61 @@ export const SEED_ANOMALIES: Anomaly[] = [
   },
 ];
 
+/**
+ * Bill.chargeIds point at these — the line-item detail (amounts, service
+ * date, CPT code, provider) that a Bills UI actually needs to render a
+ * detail page, versus Bill itself which only carries status/anomaly/claim.
+ */
+export const SEED_CHARGES: Charge[] = [
+  {
+    id: "charge-maria-1",
+    personId: "person-maria",
+    providerId: "provider-pcp",
+    serviceDate: "2026-08-20",
+    cptCode: "99214",
+    billedAmount: 540,
+    // In-network, but the provider billed the full difference directly to
+    // Maria instead of writing it off — this gap is exactly what
+    // anomaly-maria-balance-bill flags as likely not owed.
+    allowedAmount: 180,
+  },
+  {
+    id: "charge-sofia-er",
+    personId: "person-sofia",
+    providerId: "provider-er",
+    serviceDate: "2026-08-02",
+    cptCode: "99284",
+    billedAmount: 2570,
+    // Fully allowed and paid — nothing flagged, nothing owed.
+    allowedAmount: 2570,
+  },
+  {
+    id: "charge-david-checkup",
+    personId: "person-david",
+    providerId: "provider-endo",
+    serviceDate: "2026-06-15",
+    cptCode: "83036",
+    billedAmount: 320,
+    // No allowedAmount yet — insurance hasn't adjudicated this claim, which
+    // is exactly why bill-david-checkup's status is still "pending".
+  },
+];
+
+/**
+ * Display-name lookup for the providerIds referenced by SEED_CHARGES and
+ * SEED_APPOINTMENTS/SEED_EPISODES. Not part of the shared domain model —
+ * CareTeamMember records a person's regular doctor, not a per-encounter
+ * provider, so this fills the gap for building a bill's display title
+ * (e.g. "Bill from Riverside ER") without inventing a new domain field.
+ */
+export const PROVIDER_DIRECTORY: Record<string, string> = {
+  "provider-pcp": "Riverside Family Medicine",
+  "provider-er": "Riverside ER",
+  "provider-ortho": "Riverside Orthopedics",
+  "provider-endo": "Riverside Endocrine Associates",
+  "provider-pediatrician": "Riverside Family Medicine",
+};
+
 export const SEED_BILLS: Bill[] = [
   {
     id: "bill-maria-1",
@@ -366,6 +422,7 @@ export function getSeedData() {
     episodeSuggestions: SEED_EPISODE_SUGGESTIONS,
     appointments: SEED_APPOINTMENTS,
     anomalies: SEED_ANOMALIES,
+    charges: SEED_CHARGES,
     bills: SEED_BILLS,
     documents: SEED_DOCUMENTS,
     careTeam: SEED_CARE_TEAM,

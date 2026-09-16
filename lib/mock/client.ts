@@ -12,6 +12,7 @@ import type {
   AppointmentRequest,
   Bill,
   Anomaly,
+  Charge,
   CareTeamMember,
   ChatMessage,
   PersonalDataExport,
@@ -427,6 +428,11 @@ export class MockWestyClient implements WestyClient {
   async getBill(billId: string): Promise<Bill> {
     await delay(200);
     return this.state.bills.find((b) => b.id === billId) ?? notFound("Bill", billId);
+  }
+
+  async getCharges(chargeIds: string[]): Promise<Charge[]> {
+    await delay(200);
+    return chargeIds.map((id) => this.state.charges.find((c) => c.id === id) ?? notFound("Charge", id));
   }
 
   async getAnomaly(anomalyId: string): Promise<Anomaly> {

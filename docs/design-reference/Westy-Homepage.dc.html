@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style> a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); } </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="#how">How it works</a>
+    <a href="#care">What it covers</a>
+    <a href="Westy-Onboarding.dc.html">Log in</a>
+    <button type="button" class="btn btn-primary" onclick="location.href='Westy-Onboarding.dc.html'">Get started</button>
+  </nav>
+
+  <section style="max-width:1080px;margin:0 auto;padding:88px 40px 64px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;">
+    <div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:16px;">For the person who keeps it all straight</div>
+      <h1 style="font-size:52px;max-width:14ch;">One place for your family's medical bills, care, and coverage.</h1>
+      <p style="font-size:17px;max-width:48ch;opacity:0.8;margin-top:16px;">Westy pulls together every bill, provider, and insurance document for your household &mdash; and tells you, in plain language, when something needs your attention.</p>
+      <div class="row" style="display:flex;gap:12px;margin-top:28px;">
+        <button type="button" class="btn btn-primary" onclick="location.href='Westy-Onboarding.dc.html'">Get started free<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('how').scrollIntoView()">See how it works</button>
+      </div>
+      <p style="font-size:12px;opacity:0.5;margin-top:16px;">Free to start. Live in about 5 minutes.</p>
+    </div>
+    <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        <span style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span>
+      </div>
+      <p style="margin:0;font-size:15px;">&ldquo;Emma's ER bill looks off &mdash; your insurance paid less than your plan says it should have. Want me to draft an appeal?&rdquo;</p>
+      <div style="font-size:12px;opacity:0.6;">This is what Westy sounds like everywhere in the app &mdash; and you'll always know it's Westy talking, not your data.</div>
+    </div>
+  </section>
+
+  <div class="hr" style="margin:0;"></div>
+
+  <section id="how" style="max-width:1080px;margin:0 auto;padding:64px 40px;">
+    <h2 style="margin-bottom:32px;">How Westy helps, step by step</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--color-accent-700);margin-bottom:8px;">01</div>
+        <h4>Bring everything in</h4>
+        <p style="font-size:14px;opacity:0.8;">Connect your insurance, HSA/FSA card, and care team &mdash; or just upload the papers you already have. Both work, and you can do either one first.</p>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--color-accent-700);margin-bottom:8px;">02</div>
+        <h4>Westy watches your bills</h4>
+        <p style="font-size:14px;opacity:0.8;">When a bill doesn't match what your plan should cover, Westy flags it and explains why &mdash; in plain words, not insurance jargon.</p>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--color-accent-700);margin-bottom:8px;">03</div>
+        <h4>You decide what happens next</h4>
+        <p style="font-size:14px;opacity:0.8;">Draft an appeal, call a provider, or just mark it handled. Westy suggests the next step; you're always the one who takes it.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="hr" style="margin:0;"></div>
+
+  <section id="care" style="max-width:1080px;margin:0 auto;padding:64px 40px;">
+    <h2 style="margin-bottom:8px;">Everyone in your household, in one view</h2>
+    <p style="font-size:15px;opacity:0.8;max-width:56ch;margin-bottom:32px;">Each family member gets their own profile: their care team, their documents, their open bills &mdash; so you can see the whole household or zoom into just one person.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      <div class="card"><div style="width:36px;height:36px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">MJ</div><div class="card-title" style="margin-top:8px;">Maria</div><p class="card-body">Coordinator</p></div>
+      <div class="card"><div style="width:36px;height:36px;background:var(--color-neutral-700);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">DJ</div><div class="card-title" style="margin-top:8px;">Dave</div><p class="card-body">Spouse</p></div>
+      <div class="card"><div style="width:36px;height:36px;background:var(--color-accent-700);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">EJ</div><div class="card-title" style="margin-top:8px;">Emma, 9</div><p class="card-body">Daughter</p></div>
+      <div class="card"><div style="width:36px;height:36px;background:var(--color-accent-600);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">LJ</div><div class="card-title" style="margin-top:8px;">Leo, 7</div><p class="card-body">Son</p></div>
+    </div>
+  </section>
+
+  <section style="background:var(--color-accent);color:var(--color-bg);padding:72px 40px;text-align:left;">
+    <div style="max-width:1080px;margin:0 auto;">
+      <h2 style="color:var(--color-bg);max-width:20ch;">Stop juggling folders, portals, and phone calls. Let Westy hold the whole picture.</h2>
+      <button type="button" class="btn" style="background:var(--color-bg);color:var(--color-accent-800);margin-top:20px;" onclick="location.href='Westy-Onboarding.dc.html'">Get started free<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+  </section>
+
+  <footer style="max-width:1080px;margin:0 auto;padding:32px 40px;font-size:12px;opacity:0.55;">&copy; 2026 Westy. Not a substitute for medical or insurance advice.</footer>
+</div>
+
+</x-dc>
+</body>
+</html>

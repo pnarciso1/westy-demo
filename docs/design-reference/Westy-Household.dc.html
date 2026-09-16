@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); }
+    @keyframes wz-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .wz-skel { background: var(--color-neutral-200); animation: wz-pulse 1.4s ease-in-out infinite; }
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html" aria-current="page">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:40px 40px 120px;">
+    <h1 style="font-size:28px;margin-bottom:4px;">My Household</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:28px;">Every family member's care, documents, and history &mdash; on their own.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;">
+      <div class="card elev-sm" style="cursor:pointer;border:{{ borderMaria }};align-items:flex-start;" onclick="{{ selectMaria }}">
+        <div style="width:40px;height:40px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">MJ</div>
+        <div class="card-title" style="margin-top:8px;">Maria James</div>
+        <p class="card-body">Coordinator &middot; b. 1985</p>
+      </div>
+      <div class="card elev-sm" style="cursor:pointer;border:{{ borderDave }};align-items:flex-start;" onclick="{{ selectDave }}">
+        <div style="width:40px;height:40px;background:var(--color-neutral-700);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">DJ</div>
+        <div class="card-title" style="margin-top:8px;">Dave James</div>
+        <p class="card-body">Spouse &middot; b. 1984</p>
+      </div>
+      <div class="card elev-sm" style="cursor:pointer;border:{{ borderEmma }};align-items:flex-start;" onclick="{{ selectEmma }}">
+        <div style="width:40px;height:40px;background:var(--color-accent-700);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">EJ</div>
+        <div class="card-title" style="margin-top:8px;">Emma James</div>
+        <p class="card-body">Daughter &middot; age 9</p>
+      </div>
+      <div class="card elev-sm" style="cursor:pointer;border:{{ borderLeo }};align-items:flex-start;" onclick="{{ selectLeo }}">
+        <div style="width:40px;height:40px;background:var(--color-accent-600);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">LJ</div>
+        <div class="card-title" style="margin-top:8px;">Leo James</div>
+        <p class="card-body">Son &middot; age 7</p>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;margin-top:24px;margin-bottom:32px;">
+      <div class="card">
+        <div class="card-kicker">Spend this year</div>
+        <div class="card-title">{{ selSpend }}</div>
+        <div style="height:6px;background:var(--color-neutral-200);margin-top:4px;"><div style="height:100%;width:{{ selSpendPct }}%;background:var(--color-accent);"></div></div>
+        <p class="card-body">{{ selSpendNote }}</p>
+      </div>
+    </div>
+
+    <sc-if value="{{ detailLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <div>
+          <h3 style="margin:0 0 12px;opacity:0.5;">Loading care team&hellip;</h3>
+          <div class="card" style="margin-bottom:10px;"><div class="wz-skel" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="wz-skel" style="height:10px;width:30%;"></div></div>
+          <div class="card"><div class="wz-skel" style="height:14px;width:60%;margin-bottom:8px;"></div><div class="wz-skel" style="height:10px;width:35%;"></div></div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 12px;opacity:0.5;">Loading documents&hellip;</h3>
+          <div class="card" style="margin-bottom:10px;"><div class="wz-skel" style="height:14px;width:70%;margin-bottom:8px;"></div><div class="wz-skel" style="height:10px;width:30%;"></div></div>
+          <div class="card"><div class="wz-skel" style="height:14px;width:55%;margin-bottom:8px;"></div><div class="wz-skel" style="height:10px;width:30%;"></div></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ detailReady }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <div>
+          <h3 style="margin:0 0 12px;">{{ selName }}'s care team</h3>
+          <sc-for list="{{ selTeam }}" as="p" hint-placeholder-count="2">
+            <div class="card" style="flex-direction:row;align-items:center;gap:12px;margin-bottom:10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
+              <div style="flex:1;">
+                <div style="font-size:14px;font-weight:600;">{{ p.name }}</div>
+                <div style="font-size:12px;opacity:0.55;">{{ p.role }}</div>
+              </div>
+              <button type="button" class="btn btn-ghost" onclick="{{ p.schedule }}">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                Schedule with Westy
+              </button>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <h3 style="margin:0 0 12px;">{{ selName }}'s documents</h3>
+          <sc-for list="{{ selDocs }}" as="d" hint-placeholder-count="2">
+            <div class="card" style="flex-direction:row;align-items:center;gap:12px;margin-bottom:10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+              <div style="flex:1;">
+                <div style="font-size:14px;font-weight:600;">{{ d.title }}</div>
+                <div style="font-size:12px;opacity:0.55;">{{ d.meta }}</div>
+                <div style="font-size:11px;opacity:0.45;margin-top:2px;">{{ d.sourceLabel }}</div>
+              </div>
+              <sc-if value="{{ d.extracted }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Extracted</span><button type="button" class="btn btn-ghost">View</button></sc-if>
+              <sc-if value="{{ d.processing }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Processing&hellip;</span></sc-if>
+              <sc-if value="{{ d.failed }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent" style="margin-right:4px;">Failed</span><button type="button" class="btn btn-ghost">Retry</button></sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ hasEpisode }}" hint-placeholder-val="{{ false }}">
+            <a href="Westy-Episode.dc.html" style="text-decoration:none;display:block;margin-top:16px;">
+              <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;color:var(--color-text);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:4px;">Open episode</div>
+                <div style="font-size:14px;font-weight:600;">Broken arm &mdash; Riverside ER visit</div>
+                <div style="font-size:12px;opacity:0.6;margin-top:2px;">Timeline, documents and tasks for this episode &rarr;</div>
+              </div>
+            </a>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <main style="max-width:1080px;margin:0 auto;padding:0 40px 40px;">
+    <div class="hr"></div>
+    <h3 style="margin:24px 0 12px;">Household access</h3>
+    <p style="font-size:13px;opacity:0.6;margin-bottom:16px;max-width:60ch;">Who can see what. Financial data (bills, spend, HSA/FSA) can be hidden per person &mdash; care team and appointments stay visible either way.</p>
+    <div style="display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:none;">MJ</div>
+        <div style="flex:1;font-size:14px;font-weight:600;">Maria James</div>
+        <span class="tag tag-neutral">Owner &middot; full access</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:32px;height:32px;background:var(--color-neutral-700);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:none;">DJ</div>
+        <div style="flex:1;font-size:14px;font-weight:600;">Dave James</div>
+        <span class="tag tag-neutral">Full access</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);">
+        <div style="width:32px;height:32px;background:var(--color-neutral-500);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:none;">GR</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;">Grandma Ruth</div>
+          <div style="font-size:12px;opacity:0.55;">Helps with pickups for Emma &amp; Leo</div>
+        </div>
+        <span class="tag tag-outline">Care team only &middot; billing hidden</span>
+      </div>
+    </div>
+    <button type="button" class="btn btn-ghost" style="margin-top:12px;">Manage access</button>
+  </main>
+
+  <sc-if value="{{ schedOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div class="dialog-title">Schedule with Westy</div>
+          <button type="button" onclick="{{ schedClose }}" aria-label="Close" style="background:none;border:none;cursor:pointer;opacity:0.5;color:var(--color-text);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+
+        <sc-if value="{{ schedChecking }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy is working</span>
+            </div>
+            <p style="margin:0;font-size:14px;">Checking {{ schedProvider }}'s upcoming availability for {{ schedMember }}&hellip;</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ schedOptions }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span>
+            </div>
+            <p style="margin:0 0 10px;font-size:14px;">Here's what {{ schedProvider }} has open for {{ schedMember }}. Pick one and I'll book it.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button type="button" class="btn btn-secondary btn-block" onclick="{{ schedPick1 }}">Tue, Sep 16 &middot; 2:00 PM</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="{{ schedPick2 }}">Thu, Sep 18 &middot; 10:30 AM</button>
+            <button type="button" class="btn btn-secondary btn-block" onclick="{{ schedPick3 }}">Mon, Sep 22 &middot; 4:00 PM</button>
+          </div>
+          <button type="button" class="btn btn-ghost" style="margin-top:4px;" onclick="{{ schedExpire }}">None of these work</button>
+        </sc-if>
+
+        <sc-if value="{{ schedExpired }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy</span>
+            </div>
+            <p style="margin:0 0 10px;font-size:14px;">Those times were just taken by another patient. Let me check again&hellip;</p>
+            <button type="button" class="btn btn-secondary" onclick="{{ schedRefresh }}">Show new times</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ schedFailed }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Couldn't book this one</span>
+            </div>
+            <p style="margin:0 0 10px;font-size:14px;">{{ schedProvider }}'s scheduling system isn't responding right now. I can keep trying, or you can call their office directly.</p>
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn btn-secondary" onclick="{{ schedRetryFailed }}">Try again</button>
+              <button type="button" class="btn btn-primary" onclick="{{ schedClose }}">I'll call instead</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ schedConfirming }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Westy is working</span>
+            </div>
+            <p style="margin:0;font-size:14px;">Booking {{ schedSlot }} with {{ schedProvider }} for {{ schedMember }}&hellip;</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ schedBooked }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+              <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">Booked</span>
+            </div>
+            <p style="margin:0;font-size:14px;">Done &mdash; {{ schedSlot }} with {{ schedProvider }} is booked for {{ schedMember }}. It'll show up on the Appointments page and household calendar.</p>
+          </div>
+          <div class="dialog-actions">
+            <a href="Westy-Appointments.dc.html" class="btn btn-secondary">View appointments</a>
+            <button type="button" class="btn btn-primary" onclick="{{ schedClose }}">Done</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    selected: 'emma',
+    detailLoading: false,
+    sched: { open: false, stage: 'idle', member: '', provider: '', slot: '' }
+  };
+
+  select(key) {
+    this.setState({ selected: key, detailLoading: true });
+    setTimeout(() => this.setState({ detailLoading: false }), 450);
+  }
+
+  members = {
+    maria: { name: 'Maria', spend: 380, team: [{ name: 'Dr. Whitfield', role: 'Primary care physician' }], docs: [{ title: 'Annual physical summary', meta: 'Jul 2026 · PDF', status: 'extracted', source: 'synced' }], episode: false },
+    dave: { name: 'Dave', spend: 295, team: [{ name: 'Dr. Whitfield', role: 'Primary care physician' }], docs: [{ title: 'Blood panel results', meta: 'Jun 2026 · PDF', status: 'extracted', source: 'synced' }], episode: false },
+    emma: { name: 'Emma', spend: 710, team: [{ name: 'Dr. Patel', role: 'Pediatrician' }, { name: 'Dr. Francis', role: 'Orthopedist' }], docs: [
+      { title: 'Riverside Hospital ER bill', meta: 'Aug 8 · PDF', status: 'extracted', source: 'extracted' },
+      { title: 'EOB — ER visit', meta: 'Aug 15 · PDF', status: 'processing', source: 'synced' },
+      { title: 'Orthopedist follow-up note', meta: 'Sep 10 · PDF', status: 'failed', source: 'manual' }
+    ], episode: true },
+    leo: { name: 'Leo', spend: 165, team: [{ name: 'Dr. Patel', role: 'Pediatrician' }], docs: [{ title: 'Pediatric visit summary', meta: 'Sep 4 · PDF', status: 'extracted', source: 'extracted' }], episode: false }
+  };
+
+  sourceLabel(s) {
+    if (s === 'synced') return '↳ Synced from your care team';
+    if (s === 'extracted') return '↳ Extracted from your upload';
+    return '↳ Entered manually by Maria';
+  }
+  householdTotal = 1550;
+
+  openSchedule(memberName, providerName) {
+    this.setState({ sched: { open: true, stage: 'checking', member: memberName, provider: providerName, slot: '' } });
+    const failsAlways = providerName === 'Dr. Whitfield';
+    setTimeout(() => this.setState(s => ({ sched: { ...s.sched, stage: failsAlways ? 'failed' : 'options' } })), 1300);
+  }
+  retryFailed() {
+    this.setState(s => ({ sched: { ...s.sched, stage: 'checking' } }));
+    setTimeout(() => this.setState(s => ({ sched: { ...s.sched, stage: 'failed' } })), 1300);
+  }
+  expireSlots() {
+    this.setState(s => ({ sched: { ...s.sched, stage: 'expired' } }));
+  }
+  refreshSlots() {
+    this.setState(s => ({ sched: { ...s.sched, stage: 'options' } }));
+  }
+  pickSlot(slot) {
+    this.setState(s => ({ sched: { ...s.sched, stage: 'confirming', slot } }));
+    setTimeout(() => this.setState(s => ({ sched: { ...s.sched, stage: 'booked' } })), 1100);
+  }
+  closeSchedule() {
+    this.setState({ sched: { open: false, stage: 'idle', member: '', provider: '', slot: '' } });
+  }
+
+  renderVals() {
+    const sel = this.members[this.state.selected];
+    const border = k => this.state.selected === k ? '2px solid var(--color-accent)' : '1px solid transparent';
+    const team = sel.team.map(p => ({ ...p, schedule: () => this.openSchedule(sel.name, p.name) }));
+    const sched = this.state.sched;
+    const docs = sel.docs.map(d => ({ ...d, extracted: d.status === 'extracted', processing: d.status === 'processing', failed: d.status === 'failed', sourceLabel: this.sourceLabel(d.source) }));
+    return {
+      selectMaria: () => this.select('maria'),
+      selectDave: () => this.select('dave'),
+      selectEmma: () => this.select('emma'),
+      selectLeo: () => this.select('leo'),
+      detailLoading: this.state.detailLoading, detailReady: !this.state.detailLoading,
+      borderMaria: border('maria'), borderDave: border('dave'), borderEmma: border('emma'), borderLeo: border('leo'),
+      selName: sel.name, selTeam: team, selDocs: docs, hasEpisode: sel.episode,
+      selSpend: '$' + sel.spend.toLocaleString(),
+      selSpendPct: Math.round((sel.spend / this.householdTotal) * 100),
+      selSpendNote: 'Share of $' + this.householdTotal.toLocaleString() + ' spent by the household this year',
+      schedOpen: sched.open,
+      schedChecking: sched.stage === 'checking',
+      schedOptions: sched.stage === 'options',
+      schedConfirming: sched.stage === 'confirming',
+      schedBooked: sched.stage === 'booked',
+      schedFailed: sched.stage === 'failed',
+      schedExpired: sched.stage === 'expired',
+      schedExpire: () => this.expireSlots(),
+      schedRefresh: () => this.refreshSlots(),
+      schedRetryFailed: () => this.retryFailed(),
+      schedMember: sched.member, schedProvider: sched.provider, schedSlot: sched.slot,
+      schedPick1: () => this.pickSlot('Tue, Sep 16 · 2:00 PM'),
+      schedPick2: () => this.pickSlot('Thu, Sep 18 · 10:30 AM'),
+      schedPick3: () => this.pickSlot('Mon, Sep 22 · 4:00 PM'),
+      schedClose: () => this.closeSchedule()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

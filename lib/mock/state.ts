@@ -21,6 +21,7 @@ export interface MockState {
   episodeSuggestions: ReturnType<typeof getSeedData>["episodeSuggestions"];
   appointments: ReturnType<typeof getSeedData>["appointments"];
   anomalies: ReturnType<typeof getSeedData>["anomalies"];
+  charges: ReturnType<typeof getSeedData>["charges"];
   bills: ReturnType<typeof getSeedData>["bills"];
   documents: ReturnType<typeof getSeedData>["documents"];
   careTeam: ReturnType<typeof getSeedData>["careTeam"];
@@ -44,6 +45,7 @@ export function createInitialState(): MockState {
     episodeSuggestions: structuredClone(seed.episodeSuggestions),
     appointments: structuredClone(seed.appointments),
     anomalies: structuredClone(seed.anomalies),
+    charges: structuredClone(seed.charges),
     bills: structuredClone(seed.bills),
     documents: structuredClone(seed.documents),
     careTeam: structuredClone(seed.careTeam),

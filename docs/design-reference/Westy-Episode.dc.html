@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style>
+    a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); }
+    @keyframes wz-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .wz-skel { background: var(--color-neutral-200); animation: wz-pulse 1.4s ease-in-out infinite; }
+  </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html" aria-current="page">My Household</a>
+    <a href="Westy-Bills.dc.html">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:40px 40px 120px;">
+    <a href="Westy-Household.dc.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;text-decoration:none;margin-bottom:16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>My Household</a>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <button type="button" class="btn" style="border:{{ armBorder }};" onclick="{{ selectArm }}">Emma &middot; Broken arm</button>
+      <button type="button" class="btn" style="border:{{ earBorder }};" onclick="{{ selectEar }}">Leo &middot; Ear infection</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);">{{ epMember }} &middot; Episode</div>
+      <sc-if value="{{ epActive }}" hint-placeholder-val="{{ true }}"><span class="tag tag-outline">Active</span></sc-if>
+      <sc-if value="{{ epClosed }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Closed</span></sc-if>
+    </div>
+    <h1 style="font-size:28px;margin-bottom:6px;">{{ epTitle }}</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:36px;">{{ epDates }}</p>
+
+    <sc-if value="{{ epLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:48px;">
+        <div>
+          <h3 style="margin:0 0 20px;opacity:0.5;">Loading timeline&hellip;</h3>
+          <div class="wz-skel" style="height:12px;width:40%;margin-bottom:10px;"></div>
+          <div class="wz-skel" style="height:12px;width:60%;margin-bottom:10px;"></div>
+          <div class="wz-skel" style="height:12px;width:50%;"></div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 12px;opacity:0.5;">Loading documents &amp; tasks&hellip;</h3>
+          <div class="wz-skel" style="height:48px;width:100%;margin-bottom:10px;"></div>
+          <div class="wz-skel" style="height:48px;width:100%;"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ epReady }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:48px;">
+      <div>
+        <h3 style="margin:0 0 20px;">Timeline</h3>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ epTimeline }}" as="t" hint-placeholder-count="3">
+            <div style="display:flex;gap:16px;position:relative;padding-bottom:24px;">
+              <div style="width:10px;height:10px;background:{{ t.dotColor }};margin-top:5px;flex:none;"></div>
+              <sc-if value="{{ t.hasRail }}" hint-placeholder-val="{{ true }}"><div style="border-left:2px solid var(--color-divider);position:absolute;left:4px;top:16px;bottom:0;"></div></sc-if>
+              <div>
+                <div style="font-size:12px;opacity:0.55;">{{ t.date }}</div>
+                <div style="font-size:14px;font-weight:600;opacity:{{ t.opacity }};">{{ t.text }}</div>
+                <sc-if value="{{ t.hasLink }}" hint-placeholder-val="{{ false }}"><a href="{{ t.linkHref }}" style="font-size:12px;">{{ t.linkText }} &rarr;</a></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="margin:0 0 12px;">Linked documents</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+          <sc-for list="{{ epDocs }}" as="d" hint-placeholder-count="2">
+            <div class="card" style="flex-direction:row;align-items:center;gap:12px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+              <div style="flex:1;">
+                <div style="font-size:14px;font-weight:600;">{{ d.title }}</div>
+                <div style="font-size:12px;opacity:0.55;">{{ d.meta }}</div>
+              </div>
+              <button type="button" class="btn btn-ghost">View</button>
+            </div>
+          </sc-for>
+        </div>
+
+        <h3 style="margin:0 0 12px;">Linked tasks</h3>
+        <div>
+          <sc-for list="{{ epTasks }}" as="k" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-divider);opacity:{{ k.opacity }};">
+              <div style="width:18px;height:18px;flex:none;border:{{ k.boxBorder }};background:{{ k.boxBg }};color:var(--color-bg);display:flex;align-items:center;justify-content:center;">
+                <sc-if value="{{ k.done }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+              </div>
+              <div style="flex:1;font-size:13px;font-weight:600;text-decoration:{{ k.strike }};">{{ k.text }}</div>
+              <span class="{{ k.tagClass }}">{{ k.tagText }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+  </main>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { selected: 'arm', loading: false };
+
+  select(key) {
+    this.setState({ selected: key, loading: true });
+    setTimeout(() => this.setState({ loading: false }), 450);
+  }
+
+  episodes = {
+    arm: {
+      member: 'Emma James', title: 'Broken arm — Riverside ER visit', status: 'active', dates: 'Aug 3, 2026 — ongoing',
+      timeline: [
+        { date: 'Aug 3', text: 'ER visit — Riverside Hospital. Emma treated for a fractured left arm.', dot: 'accent' },
+        { date: 'Aug 4', text: 'Cast placed by Dr. Francis, orthopedist.', dot: 'text' },
+        { date: 'Aug 8', text: 'Riverside Hospital sent the ER bill.', dot: 'text' },
+        { date: 'Aug 15', text: 'EOB received — insurance paid less than expected.', dot: 'accent', link: { href: 'Westy-BillDetail.dc.html', text: 'See what Westy found' } },
+        { date: 'Upcoming', text: 'Cast-removal follow-up with Dr. Francis', dot: 'outline', muted: true, last: true }
+      ],
+      docs: [
+        { title: 'Riverside Hospital — ER bill', meta: 'Aug 8 · PDF' },
+        { title: 'EOB — ER visit', meta: 'Aug 15 · PDF' },
+        { title: 'Dr. Francis — cast note', meta: 'Aug 4 · PDF' }
+      ],
+      tasks: [
+        { text: 'Review the flagged ER bill', done: false, tagText: 'Needs attention', tagClass: 'tag tag-accent' },
+        { text: 'Schedule cast-removal follow-up', done: false, tagText: 'In progress', tagClass: 'tag tag-outline' }
+      ]
+    },
+    ear: {
+      member: 'Leo James', title: 'Ear infection', status: 'closed', dates: 'Jun 12, 2026 — closed Jun 20, 2026',
+      timeline: [
+        { date: 'Jun 12', text: 'Pediatric visit — Dr. Patel diagnosed an ear infection.', dot: 'text' },
+        { date: 'Jun 12', text: 'Antibiotics prescribed, 10-day course.', dot: 'text' },
+        { date: 'Jun 20', text: 'Follow-up call with Dr. Patel — fully recovered. Episode closed.', dot: 'text', last: true }
+      ],
+      docs: [
+        { title: 'Pediatric visit note', meta: 'Jun 12 · PDF' },
+        { title: 'Pharmacy receipt', meta: 'Jun 12 · PDF' }
+      ],
+      tasks: [
+        { text: 'Pick up antibiotics', done: true, tagText: 'Done', tagClass: 'tag tag-neutral' },
+        { text: 'Confirm follow-up with Dr. Patel', done: true, tagText: 'Done', tagClass: 'tag tag-neutral' }
+      ]
+    }
+  };
+
+  renderVals() {
+    const ep = this.episodes[this.state.selected];
+    const timeline = ep.timeline.map(t => ({
+      date: t.date, text: t.text, opacity: t.muted ? 0.6 : 1,
+      dotColor: t.dot === 'accent' ? 'var(--color-accent)' : t.dot === 'outline' ? 'var(--color-bg)' : 'var(--color-text)',
+      hasRail: !t.last, hasLink: !!t.link, linkHref: t.link ? t.link.href : '', linkText: t.link ? t.link.text : ''
+    }));
+    const tasks = ep.tasks.map(k => ({
+      text: k.text, done: k.done, opacity: k.done ? 0.55 : 1, strike: k.done ? 'line-through' : 'none',
+      boxBorder: k.done ? 'none' : '1.5px solid var(--color-divider)', boxBg: k.done ? 'var(--color-text)' : 'transparent',
+      tagText: k.tagText, tagClass: k.tagClass
+    }));
+    const border = k => this.state.selected === k ? '2px solid var(--color-accent)' : '1px solid var(--color-divider)';
+    return {
+      selectArm: () => this.select('arm'),
+      selectEar: () => this.select('ear'),
+      epLoading: this.state.loading, epReady: !this.state.loading,
+      armBorder: border('arm'), earBorder: border('ear'),
+      epMember: ep.member, epTitle: ep.title, epDates: ep.dates,
+      epActive: ep.status === 'active', epClosed: ep.status === 'closed',
+      epTimeline: timeline, epDocs: ep.docs, epTasks: tasks
+    };
+  }
+}
+
+</script>
+</body>
+</html>

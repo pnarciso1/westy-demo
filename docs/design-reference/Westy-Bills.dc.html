@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/styles.css">
+  <script src="_ds/modernist-c6f6914e-e6d9-448e-9cae-3d39a9b2ea42/_ds_bundle.js"></script>
+  <style> a { color: var(--color-accent-700); } a:hover { color: var(--color-accent-800); } </style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);position:relative;">
+  <nav class="nav" style="padding:16px 40px;">
+    <span class="nav-brand">Westy</span>
+    <a href="Westy-Dashboard.dc.html">Home</a>
+    <a href="Westy-Household.dc.html">My Household</a>
+    <a href="Westy-Bills.dc.html" aria-current="page">Bills</a>
+    <a href="Westy-Appointments.dc.html">Appointments</a>
+    <a href="Westy-Connectors.dc.html">Connections</a>
+    <a href="Westy-AskWesty.dc.html">Ask Westy</a>
+    <div style="width:32px;height:32px;background:var(--color-neutral-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">MJ</div>
+  </nav>
+
+  <main style="max-width:1000px;margin:0 auto;padding:40px 40px 120px;">
+    <h1 style="font-size:28px;margin-bottom:4px;">Bills</h1>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:24px;">Every bill across the household &mdash; what's billed, what insurance paid, and what's left.</p>
+
+    <div class="seg" style="margin-bottom:24px;">
+      <label class="seg-opt"><input type="radio" name="filter" checked="{{ fAll }}" onchange="{{ setAll }}" />All</label>
+      <label class="seg-opt"><input type="radio" name="filter" checked="{{ fPending }}" onchange="{{ setPending }}" />Pending</label>
+      <label class="seg-opt"><input type="radio" name="filter" checked="{{ fFlagged }}" onchange="{{ setFlagged }}" />Flagged</label>
+      <label class="seg-opt"><input type="radio" name="filter" checked="{{ fPaid }}" onchange="{{ setPaid }}" />Paid</label>
+      <label class="seg-opt"><input type="radio" name="filter" checked="{{ fDisputed }}" onchange="{{ setDisputed }}" />Disputed</label>
+    </div>
+
+    <table class="table">
+      <thead><tr><th>Bill</th><th>Family member</th><th>Date</th><th style="text-align:right;">Billed</th><th style="text-align:right;">Insurance paid</th><th style="text-align:right;">You owe</th><th>Status</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ bills }}" as="b" hint-placeholder-count="0">
+          <tr>
+            <td>
+              <sc-if value="{{ b.linked }}" hint-placeholder-val="{{ false }}"><a href="Westy-BillDetail.dc.html" style="text-decoration:none;">{{ b.title }}</a></sc-if>
+              <sc-if value="{{ b.notLinked }}" hint-placeholder-val="{{ true }}">{{ b.title }}</sc-if>
+            </td>
+            <td>{{ b.member }}</td>
+            <td class="text-muted">{{ b.date }}</td>
+            <td style="text-align:right;">{{ b.billed }}</td>
+            <td style="text-align:right;">{{ b.paid }}</td>
+            <td style="text-align:right;font-weight:700;">{{ b.owe }}</td>
+            <td>
+              <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span></sc-if>
+              <sc-if value="{{ b.isFlagged }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Flagged</span></sc-if>
+              <sc-if value="{{ b.isPaid }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>Paid</span></sc-if>
+              <sc-if value="{{ b.isDisputed }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;"><path d="M12 3v18"/><path d="M3 7l4-2 4 2-4 9-4-9Z"/><path d="M13 7l4-2 4 2-4 9-4-9Z"/><path d="M5 21h14"/></svg>Disputed</span></sc-if>
+            </td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+
+    <p style="font-size:12px;opacity:0.5;margin-top:16px;">Pending = waiting on insurance to process. Flagged = Westy found a gap worth a second look. Disputed = an appeal or dispute is in progress.</p>
+  </main>
+
+  <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+  </a>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { filter: 'all' };
+
+  all = [
+    { title: 'Riverside Hospital — ER bill', member: 'Emma James', date: 'Aug 8', billed: '$2,570', paid: '$1,860', owe: '$710', status: 'flagged', linked: true },
+    { title: 'Riverside Pediatrics — copay', member: 'Leo James', date: 'Sep 20', billed: '$150', paid: '—', owe: '$150', status: 'pending', linked: false },
+    { title: 'Dr. Whitfield — annual physical', member: 'Maria James', date: 'Jul 22', billed: '$320', paid: '$320', owe: '$0', status: 'paid', linked: false },
+    { title: 'Dr. Whitfield — blood panel', member: 'Dave James', date: 'Jun 14', billed: '$180', paid: '$180', owe: '$0', status: 'paid', linked: false },
+    { title: 'Dr. Francis — cast follow-up', member: 'Emma James', date: 'Aug 4', billed: '$95', paid: '$0', owe: '$95', status: 'disputed', linked: false },
+    { title: 'Riverside Hospital — X-ray facility fee', member: 'Emma James', date: 'Sep 2', billed: '$210', paid: '—', owe: '$210', status: 'pending', linked: false }
+  ];
+
+  renderVals() {
+    const f = this.state.filter;
+    const list = this.all.filter(b => f === 'all' || b.status === f).map(b => ({
+      ...b, isPending: b.status === 'pending', isFlagged: b.status === 'flagged', isPaid: b.status === 'paid', isDisputed: b.status === 'disputed',
+      notLinked: !b.linked
+    }));
+    return {
+      bills: list,
+      fAll: f === 'all', fPending: f === 'pending', fFlagged: f === 'flagged', fPaid: f === 'paid', fDisputed: f === 'disputed',
+      setAll: () => this.setState({ filter: 'all' }),
+      setPending: () => this.setState({ filter: 'pending' }),
+      setFlagged: () => this.setState({ filter: 'flagged' }),
+      setPaid: () => this.setState({ filter: 'paid' }),
+      setDisputed: () => this.setState({ filter: 'disputed' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>
