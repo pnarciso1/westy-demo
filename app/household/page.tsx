@@ -18,9 +18,11 @@ import {
 } from "@westy/shared/ui";
 import type { Appointment, CareTeamMember, Document as WestyDocument, Episode, Person } from "@westy/shared";
 import type { AddCareTeamMemberInput, ProposedSlot } from "@westy/shared/client";
+import Link from "next/link";
 import { AppNav } from "@/components/AppNav";
 import { mockWestyClient, CARE_TEAM_PROVIDER_ID } from "@/lib/mock";
 import { billFinancials, formatMoney } from "@/lib/bills";
+import { DOC_TYPE_LABEL, DOC_SOURCE_LABEL, DocumentStatusTag } from "@/lib/documents";
 
 const FINANCIAL_ACCESS_LABEL: Record<Person["financialAccess"], string> = {
   self: "Manages own finances",
@@ -29,27 +31,6 @@ const FINANCIAL_ACCESS_LABEL: Record<Person["financialAccess"], string> = {
 };
 
 const AVATAR_COLORS = ["var(--color-neutral-800)", "var(--color-neutral-700)", "var(--color-accent-700)", "var(--color-accent-600)"];
-
-const DOC_TYPE_LABEL: Record<WestyDocument["type"], string> = {
-  insurance_summary: "Insurance Benefit Summary",
-  eob: "EOB",
-  provider_bill: "Provider Bill",
-  other: "Document",
-};
-
-const DOC_STATUS_TAG: Record<WestyDocument["status"], { variant: "neutral" | "outline" | "accent"; label: string }> = {
-  uploaded: { variant: "outline", label: "Uploaded" },
-  processing: { variant: "outline", label: "Processing…" },
-  extracted: { variant: "neutral", label: "Extracted" },
-  failed: { variant: "accent", label: "Failed" },
-};
-
-// Every Document in this system arrives the same way — WestyClient has a
-// single ingestion path, uploadDocument — so there's no real "synced from a
-// connector" or "entered manually" case to distinguish yet. Showing that
-// variety would mean fabricating a distinction the domain model doesn't
-// make; this is honestly the only source label today.
-const DOC_SOURCE_LABEL = "↳ Extracted from your upload";
 
 function personSubtitle(person: Person): string {
   const role = person.relationshipToCoordinator ?? "member";
@@ -451,49 +432,50 @@ export default function Household() {
                             No documents on file yet.
                           </p>
                         )}
-                        {documents.map((doc) => {
-                          const statusTag = DOC_STATUS_TAG[doc.status];
-                          return (
-                            <Card key={doc.id} style={{ flexDirection: "row", alignItems: "center", gap: "var(--space-3)" }}>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 14, fontWeight: 600 }}>{DOC_TYPE_LABEL[doc.type]}</div>
-                                <div style={{ fontSize: 11, opacity: 0.45, marginTop: 2 }}>{DOC_SOURCE_LABEL}</div>
-                              </div>
-                              <Tag variant={statusTag.variant}>{statusTag.label}</Tag>
-                            </Card>
-                          );
-                        })}
+                        {documents.map((doc) => (
+                          <Card key={doc.id} style={{ flexDirection: "row", alignItems: "center", gap: "var(--space-3)" }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 14, fontWeight: 600 }}>{DOC_TYPE_LABEL[doc.type]}</div>
+                              <div style={{ fontSize: 11, opacity: 0.45, marginTop: 2 }}>{DOC_SOURCE_LABEL}</div>
+                            </div>
+                            <DocumentStatusTag status={doc.status} />
+                          </Card>
+                        ))}
                       </div>
 
                       {episodes
                         .filter((e) => e.status === "active")
                         .map((episode) => (
-                          <div
+                          <Link
                             key={episode.id}
-                            style={{
-                              background: "var(--color-accent-100)",
-                              border: "1px solid var(--color-accent-300)",
-                              padding: 14,
-                              marginTop: "var(--space-3)",
-                            }}
+                            href={`/episodes/${episode.id}`}
+                            style={{ display: "block", textDecoration: "none", color: "inherit", marginTop: "var(--space-3)" }}
                           >
                             <div
                               style={{
-                                fontSize: 11,
-                                fontWeight: 800,
-                                letterSpacing: "0.06em",
-                                textTransform: "uppercase",
-                                color: "var(--color-accent-700)",
-                                marginBottom: 4,
+                                background: "var(--color-accent-100)",
+                                border: "1px solid var(--color-accent-300)",
+                                padding: 14,
                               }}
                             >
-                              Open episode
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 800,
+                                  letterSpacing: "0.06em",
+                                  textTransform: "uppercase",
+                                  color: "var(--color-accent-700)",
+                                  marginBottom: 4,
+                                }}
+                              >
+                                Open episode
+                              </div>
+                              <div style={{ fontSize: 14, fontWeight: 600 }}>{episode.title}</div>
+                              <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>
+                                Timeline, documents and tasks for this episode
+                              </div>
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 600 }}>{episode.title}</div>
-                            <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>
-                              Timeline, documents and tasks for this episode
-                            </div>
-                          </div>
+                          </Link>
                         ))}
                     </section>
                   </div>

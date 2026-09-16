@@ -242,7 +242,11 @@ export default function Dashboard() {
                   <SectionLabel>Active care</SectionLabel>
                   <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
                     {summary.highlightedEpisodes.map((episode) => (
-                      <Card key={episode.id} style={{ minWidth: 220, flex: "1 1 220px" }}>
+                      <Card
+                        key={episode.id}
+                        style={{ minWidth: 220, flex: "1 1 220px", cursor: "pointer" }}
+                        onClick={() => router.push(`/episodes/${episode.id}`)}
+                      >
                         <CardKicker>Episode</CardKicker>
                         <CardTitle>{episode.title}</CardTitle>
                         <CardMeta>
