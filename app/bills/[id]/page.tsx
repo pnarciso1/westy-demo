@@ -126,6 +126,7 @@ export default function BillDetail() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Connections", href: "/connections" },
         ]}
       />
       <main

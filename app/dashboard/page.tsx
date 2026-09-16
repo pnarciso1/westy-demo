@@ -136,6 +136,7 @@ export default function Dashboard() {
           { label: "Dashboard", href: "#dashboard", active: true },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Connections", href: "/connections" },
         ]}
       />
       <main

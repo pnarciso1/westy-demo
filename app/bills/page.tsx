@@ -68,6 +68,7 @@ export default function Bills() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills", active: true },
           { label: "Household", href: "/household" },
+          { label: "Connections", href: "/connections" },
         ]}
       />
       <main
