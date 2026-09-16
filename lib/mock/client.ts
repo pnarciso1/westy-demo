@@ -27,6 +27,7 @@ import type {
   RequestAppointmentInput,
   ProposedSlot,
   DashboardSummary,
+  AddCareTeamMemberInput,
 } from "@westy/shared/client";
 import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
@@ -459,6 +460,28 @@ export class MockWestyClient implements WestyClient {
   async listCareTeam(personId: string): Promise<CareTeamMember[]> {
     await delay(200);
     return this.state.careTeam.filter((c) => c.personId === personId);
+  }
+
+  async addCareTeamMember(input: AddCareTeamMemberInput): Promise<CareTeamMember> {
+    await delay(300);
+    const member: CareTeamMember = { id: this.genId("careteam"), ...input };
+    this.state.careTeam.push(member);
+    return member;
+  }
+
+  async updateCareTeamMember(careTeamMemberId: string, input: Partial<AddCareTeamMemberInput>): Promise<CareTeamMember> {
+    await delay(300);
+    const member =
+      this.state.careTeam.find((c) => c.id === careTeamMemberId) ?? notFound("CareTeamMember", careTeamMemberId);
+    Object.assign(member, input);
+    return member;
+  }
+
+  async removeCareTeamMember(careTeamMemberId: string): Promise<void> {
+    await delay(250);
+    const index = this.state.careTeam.findIndex((c) => c.id === careTeamMemberId);
+    if (index === -1) notFound("CareTeamMember", careTeamMemberId);
+    this.state.careTeam.splice(index, 1);
   }
 
   async listTasks(personId: string): Promise<Task[]> {

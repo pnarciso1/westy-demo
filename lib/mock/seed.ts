@@ -311,6 +311,28 @@ export const PROVIDER_DIRECTORY: Record<string, string> = {
   "provider-ortho": "Riverside Orthopedics",
   "provider-endo": "Riverside Endocrine Associates",
   "provider-pediatrician": "Riverside Family Medicine",
+  // Falls back here when an appointment was requested for a care team
+  // member with no matching entry in CARE_TEAM_PROVIDER_ID below (e.g. one
+  // added live via the Care Team page) — avoids showing a raw internal id.
+  "provider-unassigned": "Care team",
+};
+
+/**
+ * CareTeamMember has no providerId of its own (it's a display-only record —
+ * a person's regular doctor, not a schedulable resource id). This maps the
+ * *seeded* care team members' ids to the matching providerId already used
+ * for their appointments/episodes/charges, so "Request appointment" has a
+ * real provider to request against. Keyed by CareTeamMember.id (not
+ * personId) so a person with more than one provider — including ones added
+ * live via the Care Team page, which have no entry here — resolves each
+ * correctly instead of colliding; an absent entry just requests without a
+ * providerId, which the mock resolves to "provider-unassigned".
+ */
+export const CARE_TEAM_PROVIDER_ID: Record<string, string> = {
+  "careteam-maria-pcp": "provider-pcp",
+  "careteam-david-endo": "provider-endo",
+  "careteam-sofia-ortho": "provider-ortho",
+  "careteam-diego-pcp": "provider-pediatrician",
 };
 
 export const SEED_BILLS: Bill[] = [
@@ -382,32 +404,48 @@ export const SEED_DOCUMENTS: WestyDocument[] = [
 
 export const SEED_CARE_TEAM: CareTeamMember[] = [
   {
+    id: "careteam-maria-pcp",
     personId: "person-maria",
     name: "Dr. Elena Ortiz",
     role: "Primary Care Physician",
     organization: "Riverside Family Medicine",
     phone: "555-0101",
+    email: "contact@riversidefamilymed.example",
+    website: "https://riversidefamilymed.example",
+    address: "100 Riverside Ave, Springfield, ST 00001",
   },
   {
+    id: "careteam-david-endo",
     personId: "person-david",
     name: "Dr. Priya Shah",
     role: "Endocrinologist",
     organization: "Riverside Endocrine Associates",
     phone: "555-0142",
+    email: "info@riversideendocrine.example",
+    website: "https://riversideendocrine.example",
+    address: "220 Riverside Ave, Springfield, ST 00001",
   },
   {
+    id: "careteam-sofia-ortho",
     personId: "person-sofia",
     name: "Dr. Marcus Webb",
     role: "Orthopedist",
     organization: "Riverside Orthopedics",
     phone: "555-0177",
+    email: "info@riversideortho.example",
+    website: "https://riversideortho.example",
+    address: "340 Riverside Ave, Springfield, ST 00001",
   },
   {
+    id: "careteam-diego-pcp",
     personId: "person-diego",
     name: "Dr. Elena Ortiz",
     role: "Pediatrician",
     organization: "Riverside Family Medicine",
     phone: "555-0101",
+    email: "contact@riversidefamilymed.example",
+    website: "https://riversidefamilymed.example",
+    address: "100 Riverside Ave, Springfield, ST 00001",
   },
 ];
 
