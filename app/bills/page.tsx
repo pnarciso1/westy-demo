@@ -66,7 +66,6 @@ export default function Bills() {
         brand="Westy"
         links={[
           { label: "Dashboard", href: "/dashboard" },
-          { label: "My Care Team", href: "/care-team" },
           { label: "Bills", href: "/bills", active: true },
           { label: "Household", href: "/household" },
         ]}

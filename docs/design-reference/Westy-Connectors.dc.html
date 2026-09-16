@@ -26,77 +26,44 @@
 
   <main style="max-width:760px;margin:0 auto;padding:40px 40px 120px;">
     <h1 style="font-size:28px;margin-bottom:4px;">Connections</h1>
-    <p style="opacity:0.65;font-size:14px;margin-bottom:32px;">Everything Westy pulls from automatically. Reconnect or disconnect anytime &mdash; nothing here is required.</p>
+    <p style="opacity:0.65;font-size:14px;margin-bottom:32px;">Everything Westy pulls from automatically. Add, reconnect, or disconnect anytime &mdash; nothing here is required.</p>
 
-    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">Insurance &amp; payer</div>
-    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ insOpacity }};">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Anthem Blue Cross</div><div style="font-size:12px;opacity:0.55;">{{ insMeta }}</div></div>
-        <sc-if value="{{ insIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ insConnect }}">Connect</button></sc-if>
-        <sc-if value="{{ insConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
-        <sc-if value="{{ insConnected }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ insDisconnect }}">Disconnect</button></sc-if>
-        <sc-if value="{{ insDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ insConnect }}">Reconnect</button></sc-if>
-      </div>
-    </div>
-
-    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">Health records (PHR/EHR)</div>
-    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ recOpacity }};">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Riverside Health patient records</div><div style="font-size:12px;opacity:0.55;">{{ recMeta }}</div></div>
-        <sc-if value="{{ recIdle }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-secondary" onclick="{{ recConnect }}">Connect</button></sc-if>
-        <sc-if value="{{ recConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
-        <sc-if value="{{ recConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ recDisconnect }}">Disconnect</button></sc-if>
-        <sc-if value="{{ recDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ recConnect }}">Reconnect</button></sc-if>
-      </div>
-    </div>
-
-    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">My Care Team</div>
-    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ provOpacity }};">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Riverside Health provider portal</div><div style="font-size:12px;opacity:0.55;">{{ provMeta }}</div></div>
-        <sc-if value="{{ provIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Connect</button></sc-if>
-        <sc-if value="{{ provConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
-        <sc-if value="{{ provConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ provDisconnect }}">Disconnect</button></sc-if>
-        <sc-if value="{{ provError }}" hint-placeholder-val="{{ true }}"><span class="tag tag-accent" style="margin-right:4px;">Needs attention</span><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Reconnect</button></sc-if>
-        <sc-if value="{{ provDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ provConnect }}">Reconnect</button></sc-if>
-      </div>
-      <sc-if value="{{ provError }}" hint-placeholder-val="{{ true }}">
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--color-divider);display:flex;align-items:center;gap:8px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-          <p style="margin:0;font-size:13px;">Their portal has been unreachable since Sep 9. Care team info is still current from your last sync &mdash; nothing's missing yet.</p>
+    <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+      <div style="margin-bottom:28px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;">{{ cat.label }}</div>
+          <button type="button" class="btn btn-ghost" onclick="{{ cat.openPicker }}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add connection
+          </button>
         </div>
-      </sc-if>
-    </div>
 
-    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">HSA card</div>
-    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:24px;opacity:{{ hsaOpacity }};">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect width="20" height="14" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">HSA card &middot; &bull;&bull;&bull;&bull; 4471</div><div style="font-size:12px;opacity:0.55;">{{ hsaMeta }}</div></div>
-        <sc-if value="{{ hsaIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ hsaConnect }}">Connect</button></sc-if>
-        <sc-if value="{{ hsaConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
-        <sc-if value="{{ hsaConnected }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ hsaDisconnect }}">Disconnect</button></sc-if>
-        <sc-if value="{{ hsaDisconnectedState }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ hsaConnect }}">Reconnect</button></sc-if>
+        <sc-if value="{{ cat.isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px dashed var(--color-divider);padding:14px;font-size:13px;opacity:0.6;">Nothing connected in this category yet.</div>
+        </sc-if>
+
+        <sc-for list="{{ cat.items }}" as="c" hint-placeholder-count="1">
+          <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:8px;opacity:{{ c.opacity }};">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:32px;height:32px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none;">{{ c.initials }}</div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:600;">{{ c.name }}</div><div style="font-size:12px;opacity:0.55;">{{ c.meta }}</div></div>
+              <sc-if value="{{ c.isConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
+              <sc-if value="{{ c.isConnected }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ c.disconnect }}">Disconnect</button></sc-if>
+              <sc-if value="{{ c.isError }}" hint-placeholder-val="{{ false }}"><span class="tag tag-accent" style="margin-right:4px;">Needs attention</span><button type="button" class="btn btn-secondary" onclick="{{ c.reconnect }}">Reconnect</button></sc-if>
+              <sc-if value="{{ c.isDisconnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ c.reconnect }}">Reconnect</button><button type="button" class="btn btn-ghost" onclick="{{ c.remove }}">Remove</button></sc-if>
+            </div>
+            <sc-if value="{{ c.isError }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--color-divider);display:flex;align-items:center;gap:8px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                <p style="margin:0;font-size:13px;">{{ c.errorNote }}</p>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
       </div>
-    </div>
+    </sc-for>
 
-    <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">FSA card</div>
-    <div style="border:1px solid var(--color-divider);padding:14px;margin-bottom:10px;opacity:{{ fsaOpacity }};">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect width="20" height="14" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:600;">FSA card</div><div style="font-size:12px;opacity:0.55;">{{ fsaMeta }}</div></div>
-        <sc-if value="{{ fsaIdle }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-secondary" onclick="{{ fsaConnect }}">Connect</button></sc-if>
-        <sc-if value="{{ fsaConnecting }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Connecting&hellip;</span></sc-if>
-        <sc-if value="{{ fsaConnected }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral" style="margin-right:4px;">Connected</span><button type="button" class="btn btn-ghost" onclick="{{ fsaDisconnect }}">Disconnect</button></sc-if>
-        <sc-if value="{{ fsaDisconnectedState }}" hint-placeholder-val="{{ true }}"><span class="tag tag-neutral" style="margin-right:4px;">Disconnected</span><button type="button" class="btn btn-secondary" onclick="{{ fsaConnect }}">Reconnect</button></sc-if>
-      </div>
-    </div>
-
-    <p style="font-size:11px;opacity:0.5;margin-top:24px;">Connected = active and syncing. Disconnected (dimmed) = you turned it off; reconnect anytime. Needs attention (red) = Westy couldn't reach it and will keep retrying.</p>
-    <a href="Westy-Onboarding.dc.html" style="font-size:13px;display:inline-block;margin-top:8px;">Add another connection from the setup flow &rarr;</a>
+    <p style="font-size:11px;opacity:0.5;margin-top:8px;">Connected = active and syncing. Disconnected (dimmed) = you turned it off; reconnect anytime. Needs attention (red) = Westy couldn't reach it and will keep retrying.</p>
 
     <div class="hr" style="margin-top:32px;"></div>
     <h3 style="margin:24px 0 8px;">Your data</h3>
@@ -129,6 +96,53 @@
     </div>
   </main>
 
+  <sc-if value="{{ pickerOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog" style="max-width:480px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:4px;">{{ pickerCategoryLabel }}</div>
+            <div class="dialog-title" style="margin:0;">Add a connection</div>
+          </div>
+          <button type="button" onclick="{{ closePicker }}" aria-label="Close" style="background:none;border:none;cursor:pointer;opacity:0.5;color:var(--color-text);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+
+        <sc-if value="{{ pickerChoosing }}" hint-placeholder-val="{{ true }}">
+          <div class="field">
+            <label>Search</label>
+            <input class="input" placeholder="{{ pickerPlaceholder }}" value="{{ pickerQuery }}" onInput="{{ setQuery }}" />
+          </div>
+          <div style="display:flex;flex-direction:column;max-height:320px;overflow:auto;border-top:1px solid var(--color-divider);">
+            <sc-for list="{{ pickerOptions }}" as="o" hint-placeholder-count="5">
+              <button type="button" onclick="{{ o.pick }}" style="display:flex;align-items:center;gap:12px;padding:12px 4px;border:none;border-bottom:1px solid var(--color-divider);background:none;cursor:pointer;text-align:left;font-family:var(--font-body);color:var(--color-text);width:100%;opacity:{{ o.opacity }};" style-hover="background:var(--color-accent-100);">
+                <div style="width:32px;height:32px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none;">{{ o.initials }}</div>
+                <div style="flex:1;"><div style="font-size:14px;font-weight:600;">{{ o.name }}</div><div style="font-size:12px;opacity:0.55;">{{ o.sub }}</div></div>
+                <sc-if value="{{ o.already }}" hint-placeholder-val="{{ false }}"><span class="tag tag-neutral">Added</span></sc-if>
+                <sc-if value="{{ o.notAlready }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;"><path d="m9 18 6-6-6-6"/></svg></sc-if>
+              </button>
+            </sc-for>
+            <sc-if value="{{ pickerNoResults }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:16px 4px;font-size:13px;opacity:0.6;">No match. Don't see yours? <a href="Westy-Onboarding.dc.html">Upload a document instead</a> and Westy will pick up the details.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ pickerAuth }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--color-divider);">
+            <div style="width:32px;height:32px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none;">{{ pickerChosenInitials }}</div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:600;">{{ pickerChosenName }}</div><div style="font-size:12px;opacity:0.55;">You'll sign in on {{ pickerChosenName }}'s site. Westy never sees your password.</div></div>
+          </div>
+          <div class="field"><label>Username or member ID</label><input class="input" placeholder="As it appears on your card" /></div>
+          <div class="field"><label>Password</label><input class="input" type="password" /></div>
+          <div class="dialog-actions">
+            <button type="button" class="btn btn-secondary" onclick="{{ backToChoose }}">Back</button>
+            <button type="button" class="btn btn-primary" onclick="{{ confirmConnect }}">Connect</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
   <a href="Westy-AskWesty.dc.html" title="Ask Westy" style="position:fixed;bottom:22px;right:22px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);text-decoration:none;box-shadow:var(--shadow-lg);z-index:20;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
   </a>
@@ -137,50 +151,136 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { insurance: 'connected', records: 'idle', providers: 'error', hsa: 'connected', fsa: 'disconnected', exportStage: 'idle' };
+  // Available connectors, seeded per category
+  catalog = {
+    payer: {
+      label: 'Insurance & payer', placeholder: 'Search insurers…',
+      options: [
+        { id: 'uhc', name: 'UnitedHealthcare', sub: 'Medical, dental, vision' },
+        { id: 'hcsc', name: 'HCSC (Blue Cross Blue Shield of IL, TX, OK, NM, MT)', sub: 'Medical' },
+        { id: 'humana', name: 'Humana', sub: 'Medical, Medicare' },
+        { id: 'bcbs', name: 'Blue Cross Blue Shield', sub: 'Choose your state plan after sign-in' },
+        { id: 'aetna', name: 'Aetna', sub: 'Medical, dental' },
+        { id: 'anthem', name: 'Anthem Blue Cross', sub: 'Medical' },
+        { id: 'cigna', name: 'Cigna Healthcare', sub: 'Medical, dental' },
+        { id: 'kaiser', name: 'Kaiser Permanente', sub: 'Integrated plan & records' }
+      ]
+    },
+    records: {
+      label: 'Health records (PHR/EHR)', placeholder: 'Search patient portals…',
+      options: [
+        { id: 'mychart', name: 'MyChart (Epic)', sub: 'Used by most large hospital systems' },
+        { id: 'followmyhealth', name: 'FollowMyHealth (Veradigm)', sub: 'Patient portal' },
+        { id: 'healow', name: 'healow (eClinicalWorks)', sub: 'Patient portal' },
+        { id: 'athena', name: 'athenaPatient (athenahealth)', sub: 'Patient portal' },
+        { id: 'cerner', name: 'Oracle Health Patient Portal (Cerner)', sub: 'Patient portal' },
+        { id: 'applehealth', name: 'Apple Health Records', sub: 'Import from iPhone' },
+        { id: 'riverside', name: 'Riverside Health patient records', sub: 'MyChart-powered' }
+      ]
+    },
+    providers: {
+      label: 'My Care Team', placeholder: 'Search practices & hospitals…',
+      options: [
+        { id: 'riverside-portal', name: 'Riverside Health provider portal', sub: 'Riverside Hospital, Riverside Pediatrics' },
+        { id: 'whitfield', name: 'Whitfield Family Medicine', sub: 'Dr. Whitfield · primary care' },
+        { id: 'francis-ortho', name: 'Francis Orthopedics', sub: 'Dr. Francis · orthopedist' },
+        { id: 'patel-peds', name: 'Patel Pediatrics', sub: 'Dr. Patel · pediatrician' },
+        { id: 'zocdoc', name: 'Zocdoc', sub: 'Find & book new providers' }
+      ]
+    },
+    hsa: {
+      label: 'HSA / FSA cards', placeholder: 'Search benefit administrators…',
+      options: [
+        { id: 'westypay', name: 'WestyPay (Howlite)', sub: 'HSA, FSA · pay bills directly from Westy' },
+        { id: 'healthequity', name: 'HealthEquity', sub: 'HSA, FSA, HRA' },
+        { id: 'optum', name: 'Optum Financial', sub: 'HSA, FSA' },
+        { id: 'fidelity', name: 'Fidelity HSA', sub: 'HSA' },
+        { id: 'wex', name: 'WEX Benefits', sub: 'FSA, HSA' },
+        { id: 'lively', name: 'Lively', sub: 'HSA, FSA' },
+        { id: 'payflex', name: 'Inspira Financial (PayFlex)', sub: 'FSA, HSA' }
+      ]
+    }
+  };
 
-  startExport() {
-    this.setState({ exportStage: 'preparing' });
-    setTimeout(() => this.setState({ exportStage: 'ready' }), 1600);
-  }
+  state = {
+    connections: [
+      { uid: 1, cat: 'payer', optId: 'anthem', status: 'connected', meta: 'Synced today' },
+      { uid: 2, cat: 'providers', optId: 'riverside-portal', status: 'error', meta: 'Last synced Sep 9 · connection lost', errorNote: 'Their portal has been unreachable since Sep 9. Care team info is still current from your last sync — nothing’s missing yet.' },
+      { uid: 3, cat: 'hsa', optId: 'healthequity', status: 'connected', meta: 'HSA · •••• 4471 · $1,180 available' },
+      { uid: 4, cat: 'hsa', optId: 'wex', status: 'disconnected', meta: 'FSA · turned off by you' }
+    ],
+    nextUid: 5,
+    picker: { open: false, cat: null, stage: 'choose', query: '', chosen: null },
+    exportStage: 'idle'
+  };
 
-  connect(key) {
-    this.setState({ [key]: 'connecting' });
-    setTimeout(() => this.setState({ [key]: 'connected' }), 1200);
+  initials(name) {
+    return name.split(/[\s(]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   }
-  disconnect(key) { this.setState({ [key]: 'disconnected' }); }
+  optById(cat, id) { return this.catalog[cat].options.find(o => o.id === id); }
 
-  fields(prefix, key, connectedMeta) {
-    const s = this.state[key];
-    const opacity = s === 'disconnected' ? 0.55 : 1;
-    let meta = 'Not connected yet';
-    if (s === 'connecting') meta = 'Connecting…';
-    if (s === 'connected') meta = connectedMeta;
-    if (s === 'error') meta = 'Last synced Sep 9 · connection lost';
-    if (s === 'disconnected') meta = 'Turned off by you';
-    const out = {};
-    out[prefix + 'Opacity'] = opacity;
-    out[prefix + 'Meta'] = meta;
-    out[prefix + 'Idle'] = s === 'idle';
-    out[prefix + 'Connecting'] = s === 'connecting';
-    out[prefix + 'Connected'] = s === 'connected';
-    out[prefix + 'Error'] = s === 'error';
-    out[prefix + 'DisconnectedState'] = s === 'disconnected';
-    out[prefix + 'Connect'] = () => this.connect(key);
-    out[prefix + 'Disconnect'] = () => this.disconnect(key);
-    return out;
+  openPicker(cat) { this.setState({ picker: { open: true, cat, stage: 'choose', query: '', chosen: null } }); }
+  closePicker() { this.setState(s => ({ picker: { ...s.picker, open: false } })); }
+  pick(optId) { this.setState(s => ({ picker: { ...s.picker, stage: 'auth', chosen: optId } })); }
+  backToChoose() { this.setState(s => ({ picker: { ...s.picker, stage: 'choose', chosen: null } })); }
+  confirmConnect() {
+    const { cat, chosen } = this.state.picker;
+    const uid = this.state.nextUid;
+    this.setState(s => ({
+      connections: [...s.connections, { uid, cat, optId: chosen, status: 'connecting', meta: 'Connecting…' }],
+      nextUid: uid + 1,
+      picker: { ...s.picker, open: false }
+    }));
+    setTimeout(() => this.setStatus(uid, 'connected', 'Synced just now'), 1400);
   }
+  setStatus(uid, status, meta) {
+    this.setState(s => ({ connections: s.connections.map(c => c.uid === uid ? { ...c, status, meta } : c) }));
+  }
+  reconnect(uid) {
+    this.setStatus(uid, 'connecting', 'Connecting…');
+    setTimeout(() => this.setStatus(uid, 'connected', 'Synced just now'), 1200);
+  }
+  disconnect(uid) { this.setStatus(uid, 'disconnected', 'Turned off by you'); }
+  remove(uid) { this.setState(s => ({ connections: s.connections.filter(c => c.uid !== uid) })); }
+  startExport() { this.setState({ exportStage: 'preparing' }); setTimeout(() => this.setState({ exportStage: 'ready' }), 1600); }
 
   renderVals() {
+    const s = this.state;
+    const categories = Object.keys(this.catalog).map(catKey => {
+      const cat = this.catalog[catKey];
+      const items = s.connections.filter(c => c.cat === catKey).map(c => {
+        const o = this.optById(catKey, c.optId);
+        return {
+          name: o.name, initials: this.initials(o.name), meta: c.meta, errorNote: c.errorNote || '',
+          opacity: c.status === 'disconnected' ? 0.55 : 1,
+          isConnecting: c.status === 'connecting', isConnected: c.status === 'connected',
+          isError: c.status === 'error', isDisconnected: c.status === 'disconnected',
+          reconnect: () => this.reconnect(c.uid), disconnect: () => this.disconnect(c.uid), remove: () => this.remove(c.uid)
+        };
+      });
+      return { label: cat.label, items, isEmpty: items.length === 0, openPicker: () => this.openPicker(catKey) };
+    });
+
+    const p = s.picker;
+    const pcat = p.cat ? this.catalog[p.cat] : null;
+    const q = p.query.trim().toLowerCase();
+    const alreadyIds = new Set(s.connections.filter(c => c.cat === p.cat).map(c => c.optId));
+    const pickerOptions = pcat ? pcat.options.filter(o => !q || o.name.toLowerCase().includes(q) || o.sub.toLowerCase().includes(q)).map(o => ({
+      name: o.name, sub: o.sub, initials: this.initials(o.name),
+      already: alreadyIds.has(o.id), notAlready: !alreadyIds.has(o.id), opacity: alreadyIds.has(o.id) ? 0.5 : 1,
+      pick: alreadyIds.has(o.id) ? () => {} : () => this.pick(o.id)
+    })) : [];
+    const chosen = p.chosen && pcat ? this.optById(p.cat, p.chosen) : null;
+
     return {
-      ...this.fields('ins', 'insurance', 'Connected · Synced today'),
-      ...this.fields('rec', 'records', 'Connected · Synced just now'),
-      ...this.fields('prov', 'providers', ''),
-      ...this.fields('hsa', 'hsa', 'Connected · $1,180 available'),
-      ...this.fields('fsa', 'fsa', 'Connected · $340 available'),
-      exportIdle: this.state.exportStage === 'idle',
-      exportPreparing: this.state.exportStage === 'preparing',
-      exportReady: this.state.exportStage === 'ready',
+      categories,
+      pickerOpen: p.open, pickerChoosing: p.stage === 'choose', pickerAuth: p.stage === 'auth',
+      pickerCategoryLabel: pcat ? pcat.label : '', pickerPlaceholder: pcat ? pcat.placeholder : '',
+      pickerQuery: p.query, setQuery: (e) => this.setState(st => ({ picker: { ...st.picker, query: e.target.value } })),
+      pickerOptions, pickerNoResults: pcat && pickerOptions.length === 0,
+      pickerChosenName: chosen ? chosen.name : '', pickerChosenInitials: chosen ? this.initials(chosen.name) : '',
+      closePicker: () => this.closePicker(), backToChoose: () => this.backToChoose(), confirmConnect: () => this.confirmConnect(),
+      exportIdle: s.exportStage === 'idle', exportPreparing: s.exportStage === 'preparing', exportReady: s.exportStage === 'ready',
       startExport: () => this.startExport()
     };
   }

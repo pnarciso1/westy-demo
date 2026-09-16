@@ -124,7 +124,6 @@ export default function BillDetail() {
         brand="Westy"
         links={[
           { label: "Dashboard", href: "/dashboard" },
-          { label: "My Care Team", href: "/care-team" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
         ]}

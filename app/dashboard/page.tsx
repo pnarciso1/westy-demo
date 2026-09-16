@@ -134,7 +134,6 @@ export default function Dashboard() {
         brand="Westy"
         links={[
           { label: "Dashboard", href: "#dashboard", active: true },
-          { label: "My Care Team", href: "/care-team" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
         ]}
