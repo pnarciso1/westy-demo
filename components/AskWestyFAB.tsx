@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 
 // "/" and "/onboarding" per the task; "/ask-westy" too — the FAB only
 // exists to jump to that page, so showing it there would just be a
-// self-referential "click to go here" link.
-const HIDDEN_ROUTES = ["/", "/onboarding", "/ask-westy"];
+// self-referential "click to go here" link. "/login" joins the same
+// pre-account group as "/" and "/onboarding" now that it exists.
+const HIDDEN_ROUTES = ["/", "/onboarding", "/ask-westy", "/login"];
 
 /**
  * The simple, persistent FAB that appears in 7 of the 11 design files

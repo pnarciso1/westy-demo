@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Card, Tag, Button, Skeleton, SectionLabel } from "@westy/shared/ui";
 import type { Appointment, Document as WestyDocument, Episode, Person, Task } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
 import { formatShortDate } from "@/lib/bills";
 import { DOC_TYPE_LABEL, DOC_SOURCE_LABEL, DocumentStatusTag } from "@/lib/documents";
@@ -56,9 +57,11 @@ export default function EpisodeDetail() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

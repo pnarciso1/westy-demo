@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SegmentedControl, Skeleton } from "@westy/shared/ui";
 import type { Bill } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
 import { BillsListStatusTag, billFinancials, billTitle, formatMoney, formatShortDate } from "@/lib/bills";
 
@@ -68,9 +69,11 @@ export default function Bills() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills", active: true },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

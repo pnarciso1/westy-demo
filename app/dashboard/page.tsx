@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import {
   Card,
   CardKicker,
@@ -136,9 +137,11 @@ export default function Dashboard() {
           { label: "Dashboard", href: "#dashboard", active: true },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

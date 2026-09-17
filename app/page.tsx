@@ -53,7 +53,7 @@ export default function Home() {
         brand="Westy"
         links={[
           { label: "How it works", href: "#how-it-works" },
-          { label: "Log in", href: "/dashboard" },
+          { label: "Log in", href: "/login" },
         ]}
         trailing={
           <Button variant="primary" onClick={() => router.push("/onboarding")}>

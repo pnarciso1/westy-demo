@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Dialog, Field, TextInput, Tag, AiSurface, SectionLabel, Skeleton } from "@westy/shared/ui";
 import type { Connector, Person, PersonalDataExport } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient } from "@/lib/mock";
 import { formatShortDate } from "@/lib/bills";
 
@@ -203,9 +204,11 @@ export default function Connections() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections", active: true },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

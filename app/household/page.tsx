@@ -20,6 +20,7 @@ import type { Appointment, CareTeamMember, Document as WestyDocument, Episode, P
 import type { AddCareTeamMemberInput, ProposedSlot } from "@westy/shared/client";
 import Link from "next/link";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient, CARE_TEAM_PROVIDER_ID } from "@/lib/mock";
 import { billFinancials, formatMoney } from "@/lib/bills";
 import { DOC_TYPE_LABEL, DOC_SOURCE_LABEL, DocumentStatusTag } from "@/lib/documents";
@@ -267,9 +268,11 @@ export default function Household() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household", active: true },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

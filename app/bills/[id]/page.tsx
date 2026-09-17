@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Card, CardKicker, CardTitle, CardBody, Tag, Button, Skeleton, AiSurface } from "@westy/shared/ui";
 import type { Anomaly, Bill, CareTeamMember, Charge } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
 import {
   BillDetailStatusTag,
@@ -126,9 +127,11 @@ export default function BillDetail() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy" },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{

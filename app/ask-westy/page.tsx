@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AiSurface, Button, TextInput, Skeleton } from "@westy/shared/ui";
 import type { ChatMessage, ChatThread } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
+import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient } from "@/lib/mock";
 
 export default function AskWesty() {
@@ -45,9 +46,11 @@ export default function AskWesty() {
           { label: "Dashboard", href: "/dashboard" },
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
+          { label: "Appointments", href: "/appointments" },
           { label: "Connections", href: "/connections" },
           { label: "Ask Westy", href: "/ask-westy", active: true },
         ]}
+        trailing={<UserAvatar />}
       />
       <main
         style={{
