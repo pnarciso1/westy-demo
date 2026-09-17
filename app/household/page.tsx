@@ -268,6 +268,7 @@ export default function Household() {
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household", active: true },
           { label: "Connections", href: "/connections" },
+          { label: "Ask Westy", href: "/ask-westy" },
         ]}
       />
       <main

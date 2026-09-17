@@ -69,6 +69,7 @@ export default function Bills() {
           { label: "Bills", href: "/bills", active: true },
           { label: "Household", href: "/household" },
           { label: "Connections", href: "/connections" },
+          { label: "Ask Westy", href: "/ask-westy" },
         ]}
       />
       <main

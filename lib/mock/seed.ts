@@ -501,13 +501,18 @@ export const SEED_CHAT_THREAD: ChatThread = {
   personId: "person-maria",
   messages: [
     {
-      id: "msg-1",
+      // Deliberately not "msg-1"/"msg-2" — MockWestyClient.genId("msg") starts
+      // its own counter at 1 each session, so a plain numeric suffix here
+      // would collide with the very first live chat message it generates
+      // (see sendChatMessage). Every other seeded entity avoids this by using
+      // a descriptive id; chat messages need the same treatment.
+      id: "msg-maria-1",
       role: "user",
       text: "Why was I billed for Sofia's ER visit if we already met our deductible?",
       isAiGenerated: false,
     },
     {
-      id: "msg-2",
+      id: "msg-maria-2",
       role: "assistant",
       text: "Looking at your plan, your family deductible was met on July 28th — before this visit. This charge looks like a balance bill from an in-network provider, which usually isn't something you owe. I've flagged it on your Bills page with a suggested next step.",
       isAiGenerated: true,

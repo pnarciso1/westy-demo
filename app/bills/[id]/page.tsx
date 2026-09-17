@@ -127,6 +127,7 @@ export default function BillDetail() {
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
           { label: "Connections", href: "/connections" },
+          { label: "Ask Westy", href: "/ask-westy" },
         ]}
       />
       <main

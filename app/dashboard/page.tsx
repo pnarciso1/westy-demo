@@ -137,6 +137,7 @@ export default function Dashboard() {
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
           { label: "Connections", href: "/connections" },
+          { label: "Ask Westy", href: "/ask-westy" },
         ]}
       />
       <main

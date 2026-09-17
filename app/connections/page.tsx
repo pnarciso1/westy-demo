@@ -204,6 +204,7 @@ export default function Connections() {
           { label: "Bills", href: "/bills" },
           { label: "Household", href: "/household" },
           { label: "Connections", href: "/connections", active: true },
+          { label: "Ask Westy", href: "/ask-westy" },
         ]}
       />
       <main
