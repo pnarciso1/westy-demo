@@ -624,3 +624,11 @@ export function getSeedData() {
     chatThread: SEED_CHAT_THREAD,
   };
 }
+
+/**
+ * The plan the insurance connect flow "finds" after the user uploads a
+ * Statement of Benefits or enters an exchange plan ID — always Maria's
+ * seeded payer, since the demo has no real plan lookup.
+ */
+export const DEMO_PAYER_PLAN_NAME =
+  SEED_CONNECTORS.find((c) => c.id === "connector-maria-payer")?.vendor ?? "Riverside Health Plan";
