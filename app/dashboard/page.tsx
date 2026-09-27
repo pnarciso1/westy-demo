@@ -16,7 +16,7 @@ import {
   SectionLabel,
   AiSurface,
 } from "@westy/shared/ui";
-import type { Anomaly, Appointment, Benefit, Bill, Boost, Person, Task } from "@westy/shared";
+import type { AppointmentPrepBoost, Anomaly, Appointment, Benefit, Bill, Boost, Person, Task } from "@westy/shared";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
 import { billFinancials, billTitle, formatMoney, formatShortDate } from "@/lib/bills";
 import type { DashboardSummary } from "@westy/shared/client";
@@ -49,6 +49,8 @@ export default function Dashboard() {
   const [boosts, setBoosts] = useState<Boost[]>([]);
   const [appointmentsById, setAppointmentsById] = useState<Record<string, Appointment>>({});
   const [benefitsById, setBenefitsById] = useState<Record<string, Benefit>>({});
+  const [prepNotesDraft, setPrepNotesDraft] = useState<Record<string, string>>({});
+  const [savingPrepId, setSavingPrepId] = useState<string | null>(null);
   const boostPollsRef = useRef<Record<string, ReturnType<typeof setInterval>>>({});
 
   useEffect(() => {
@@ -172,6 +174,20 @@ export default function Dashboard() {
   async function handleDismissBoost(boostId: string) {
     await mockWestyClient.dismissBoost(boostId);
     setBoosts((prev) => prev.filter((b) => b.id !== boostId));
+  }
+
+  async function handleSaveAppointmentPrep(boost: AppointmentPrepBoost) {
+    const notes = prepNotesDraft[boost.id] ?? boost.userNotes ?? "";
+    setSavingPrepId(boost.id);
+    const document = await mockWestyClient.generateAppointmentPrepDocument(boost.id, notes);
+    setBoosts((prev) =>
+      prev.map((b) =>
+        b.id === boost.id && b.kind === "appointment_prep"
+          ? { ...b, userNotes: notes, generatedDocumentId: document.id }
+          : b
+      )
+    );
+    setSavingPrepId(null);
   }
 
   function boostSuggestionText(boost: Boost): string {
@@ -475,9 +491,57 @@ export default function Dashboard() {
                       </>
                     )}
                     {boost.status === "accepted" && <p style={{ margin: 0 }}>Westy is looking into this — one moment…</p>}
-                    {boost.status === "completed" && boost.kind === "appointment_prep" && (
-                      <p style={{ margin: 0 }}>{boost.prepNotes}</p>
-                    )}
+                    {boost.status === "completed" &&
+                      boost.kind === "appointment_prep" &&
+                      (() => {
+                        const appointment = appointmentsById[boost.appointmentId];
+                        const memberName = appointment
+                          ? summary.members.find((m) => m.id === appointment.personId)?.firstName
+                          : undefined;
+                        const saved = Boolean(boost.generatedDocumentId);
+                        return (
+                          <div>
+                            <p style={{ margin: "0 0 10px" }}>{boost.prepNotes}</p>
+                            <label
+                              htmlFor={`prep-notes-${boost.id}`}
+                              style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}
+                            >
+                              Anything you&apos;d like to jot down before the visit?
+                            </label>
+                            <textarea
+                              id={`prep-notes-${boost.id}`}
+                              className="input"
+                              rows={3}
+                              style={{ width: "100%", marginBottom: 10 }}
+                              value={prepNotesDraft[boost.id] ?? boost.userNotes ?? ""}
+                              onChange={(e) =>
+                                setPrepNotesDraft((prev) => ({ ...prev, [boost.id]: e.target.value }))
+                              }
+                            />
+                            {saved ? (
+                              <>
+                                <p style={{ margin: "0 0 10px", fontSize: 12, opacity: 0.7 }}>
+                                  Saved to {memberName ?? "their"}&apos;s Documents.
+                                </p>
+                                <Button
+                                  variant="secondary"
+                                  onClick={() => router.push(`/documents/${boost.generatedDocumentId}/prep-print`)}
+                                >
+                                  View / print your prep sheet
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                disabled={savingPrepId === boost.id}
+                                onClick={() => handleSaveAppointmentPrep(boost)}
+                              >
+                                {savingPrepId === boost.id ? "Saving…" : "Save appointment prep"}
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })()}
                     {boost.status === "completed" &&
                       boost.kind === "benefits_exploration" &&
                       (() => {

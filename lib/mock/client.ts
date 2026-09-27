@@ -33,7 +33,7 @@ import type {
 } from "@westy/shared/client";
 import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
-import { PROVIDER_DIRECTORY } from "./seed";
+import { PROVIDER_DIRECTORY, CARE_TEAM_PROVIDER_ID } from "./seed";
 
 /**
  * The one scripted failure in the demo: no provider_portal integration
@@ -542,6 +542,46 @@ export class MockWestyClient implements WestyClient {
     await delay(200);
     const boost = this.state.boosts.find((b) => b.id === boostId) ?? notFound("Boost", boostId);
     boost.status = "dismissed";
+  }
+
+  async generateAppointmentPrepDocument(boostId: string, userNotes?: string): Promise<WestyDocument> {
+    await delay(400);
+    const boost = this.state.boosts.find((b) => b.id === boostId) ?? notFound("Boost", boostId);
+    if (boost.kind !== "appointment_prep") throw new Error(`Boost is not an appointment_prep boost: ${boostId}`);
+    const appointment =
+      this.state.appointments.find((a) => a.id === boost.appointmentId) ?? notFound("Appointment", boost.appointmentId);
+    const provider = PROVIDER_DIRECTORY[appointment.providerId] ?? "your care team";
+    const careTeamId = Object.entries(CARE_TEAM_PROVIDER_ID).find(([, providerId]) => providerId === appointment.providerId)?.[0];
+    const careTeamMember = careTeamId ? this.state.careTeam.find((c) => c.id === careTeamId) : undefined;
+    if (userNotes !== undefined) boost.userNotes = userNotes;
+    const document: WestyDocument = {
+      id: this.genId("doc"),
+      personId: appointment.personId,
+      episodeId: appointment.episodeId,
+      appointmentId: appointment.id,
+      type: "appointment_prep",
+      status: "extracted",
+      extracted: {
+        provider,
+        scheduledFor: appointment.scheduledFor,
+        reason: appointment.reason,
+        address: careTeamMember?.address,
+        phone: careTeamMember?.phone,
+        whatToBring: ["Photo ID", "Insurance card"],
+        userNotes: boost.userNotes,
+      },
+      explanation: `Everything to bring to the "${appointment.reason ?? "visit"}" appointment at ${provider}, plus your own notes.`,
+      createdAt: new Date().toISOString(),
+    };
+    this.state.documents.push(document);
+    boost.generatedDocumentId = document.id;
+    // Episode.documentIds are real foreign keys the Episode page filters
+    // by — pushing here is what makes this document show up there too.
+    if (appointment.episodeId) {
+      const episode = this.state.episodes.find((e) => e.id === appointment.episodeId);
+      if (episode) episode.documentIds.push(document.id);
+    }
+    return document;
   }
 
   async listBenefits(householdId: string): Promise<Benefit[]> {

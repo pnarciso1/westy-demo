@@ -5,6 +5,7 @@ export const DOC_TYPE_LABEL: Record<WestyDocument["type"], string> = {
   insurance_summary: "Insurance Benefit Summary",
   eob: "EOB",
   provider_bill: "Provider Bill",
+  appointment_prep: "Appointment Prep",
   other: "Document",
 };
 
