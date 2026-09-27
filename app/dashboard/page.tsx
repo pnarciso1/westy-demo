@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { UserAvatar } from "@/components/UserAvatar";
@@ -16,7 +16,7 @@ import {
   SectionLabel,
   AiSurface,
 } from "@westy/shared/ui";
-import type { Anomaly, Appointment, Bill, Person, Task } from "@westy/shared";
+import type { Anomaly, Appointment, Benefit, Bill, Boost, Person, Task } from "@westy/shared";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
 import { billFinancials, billTitle, formatMoney, formatShortDate } from "@/lib/bills";
 import type { DashboardSummary } from "@westy/shared/client";
@@ -45,9 +45,21 @@ export default function Dashboard() {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState<UpcomingAppointment[]>([]);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [personId, setPersonId] = useState("");
+  const [boosts, setBoosts] = useState<Boost[]>([]);
+  const [appointmentsById, setAppointmentsById] = useState<Record<string, Appointment>>({});
+  const [benefitsById, setBenefitsById] = useState<Record<string, Benefit>>({});
+  const boostPollsRef = useRef<Record<string, ReturnType<typeof setInterval>>>({});
+
+  useEffect(() => {
+    return () => {
+      Object.values(boostPollsRef.current).forEach(clearInterval);
+    };
+  }, []);
 
   async function loadDashboard() {
     const user = await mockWestyClient.getCurrentUser();
+    setPersonId(user.personId);
     const data = await mockWestyClient.getDashboard(user.personId);
     setSummary(data);
 
@@ -78,6 +90,19 @@ export default function Dashboard() {
         return { member, billsWithCharges, tasks, appointments };
       })
     );
+
+    const [boostList, benefitList] = await Promise.all([
+      mockWestyClient.listBoosts(user.personId),
+      mockWestyClient.listBenefits(data.household.id),
+    ]);
+    setBoosts(boostList.filter((b) => b.status !== "dismissed"));
+    setBenefitsById(Object.fromEntries(benefitList.map((b) => [b.id, b])));
+
+    const apptMap: Record<string, Appointment> = {};
+    for (const { appointments } of perMember) {
+      for (const appt of appointments) apptMap[appt.id] = appt;
+    }
+    setAppointmentsById(apptMap);
 
     let openOwed = 0;
     let totalSpend = 0;
@@ -122,6 +147,48 @@ export default function Dashboard() {
   async function handleCompleteTask(taskId: string) {
     await mockWestyClient.completeTask(taskId);
     await loadDashboard();
+  }
+
+  function pollBoost(boostId: string) {
+    const interval = setInterval(async () => {
+      const list = await mockWestyClient.listBoosts(personId);
+      const updated = list.find((b) => b.id === boostId);
+      if (!updated) return;
+      setBoosts((prev) => prev.map((b) => (b.id === boostId ? updated : b)));
+      if (updated.status !== "accepted") {
+        clearInterval(interval);
+        delete boostPollsRef.current[boostId];
+      }
+    }, 500);
+    boostPollsRef.current[boostId] = interval;
+  }
+
+  async function handleAcceptBoost(boostId: string) {
+    const updated = await mockWestyClient.acceptBoost(boostId);
+    setBoosts((prev) => prev.map((b) => (b.id === boostId ? updated : b)));
+    pollBoost(boostId);
+  }
+
+  async function handleDismissBoost(boostId: string) {
+    await mockWestyClient.dismissBoost(boostId);
+    setBoosts((prev) => prev.filter((b) => b.id !== boostId));
+  }
+
+  function boostSuggestionText(boost: Boost): string {
+    if (boost.kind === "appointment_prep") {
+      const appointment = appointmentsById[boost.appointmentId];
+      const provider = appointment ? PROVIDER_DIRECTORY[appointment.providerId] ?? "your provider" : "your provider";
+      return `You have an upcoming appointment with ${provider} — want help preparing?`;
+    }
+    const benefit = benefitsById[boost.benefitId];
+    return benefit
+      ? `You have an unused benefit (${benefit.name}) that's about to expire — want me to walk you through it?`
+      : "You have an unused benefit that's about to expire — want me to walk you through it?";
+  }
+
+  function formatBenefitValue(benefit: Benefit): string {
+    const format = (value: number) => (benefit.unit === "usd" ? formatMoney(value) : `${value} ${benefit.unit}`);
+    return `${format(benefit.remainingValue)} of ${format(benefit.totalValue)} remaining · Expires ${formatShortDate(benefit.expiresOn)}`;
   }
 
   const openTasks = allTasks.filter((t) => t.status === "open");
@@ -392,6 +459,41 @@ export default function Dashboard() {
             <div>
               <SectionLabel>What&apos;s new</SectionLabel>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                {boosts.map((boost) => (
+                  <AiSurface key={boost.id}>
+                    {boost.status === "suggested" && (
+                      <>
+                        <p style={{ margin: "0 0 10px" }}>{boostSuggestionText(boost)}</p>
+                        <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                          <Button variant="secondary" onClick={() => handleDismissBoost(boost.id)}>
+                            Dismiss
+                          </Button>
+                          <Button variant="primary" onClick={() => handleAcceptBoost(boost.id)}>
+                            Yes, help me
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                    {boost.status === "accepted" && <p style={{ margin: 0 }}>Westy is looking into this — one moment…</p>}
+                    {boost.status === "completed" && boost.kind === "appointment_prep" && (
+                      <p style={{ margin: 0 }}>{boost.prepNotes}</p>
+                    )}
+                    {boost.status === "completed" &&
+                      boost.kind === "benefits_exploration" &&
+                      (() => {
+                        const benefit = benefitsById[boost.benefitId];
+                        if (!benefit) return null;
+                        return (
+                          <div>
+                            <p style={{ margin: "0 0 4px", fontWeight: 600 }}>{benefit.name}</p>
+                            <p style={{ margin: "0 0 6px" }}>{benefit.description}</p>
+                            <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>{formatBenefitValue(benefit)}</p>
+                          </div>
+                        );
+                      })()}
+                  </AiSurface>
+                ))}
+
                 {summary.pendingEpisodeSuggestions.map((suggestion) => (
                   <AiSurface key={suggestion.id}>
                     <p style={{ margin: "0 0 10px" }}>

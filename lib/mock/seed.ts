@@ -13,6 +13,8 @@ import type {
   Connector,
   ChatThread,
   Task,
+  Benefit,
+  Boost,
 } from "@westy/shared";
 
 /**
@@ -128,6 +130,7 @@ export const SEED_EPISODE_SUGGESTIONS: EpisodeSuggestion[] = [
     appointmentIds: ["appt-diego-wellness"],
     documentIds: [],
     status: "pending",
+    createdAt: "2026-09-11T09:00:00.000Z",
   },
 ];
 
@@ -210,6 +213,7 @@ export const SEED_ANOMALIES: Anomaly[] = [
     explanation:
       "This provider billed you directly for the difference between their charge and what your plan paid. Since they're in-network, this amount likely isn't something you owe.",
     suggestedAction: "dispute_with_payer",
+    createdAt: "2026-08-22T09:15:00.000Z",
   },
   {
     id: "anomaly-david-coding-mismatch",
@@ -221,6 +225,7 @@ export const SEED_ANOMALIES: Anomaly[] = [
     explanation:
       "The billing code your endocrinologist's office submitted doesn't match the visit type, which caused your insurance to underpay this claim. This is a billing office error, not something you should pay out of pocket.",
     suggestedAction: "call_provider",
+    createdAt: "2026-09-03T11:00:00.000Z",
   },
   {
     id: "anomaly-sofia-oon-surprise",
@@ -232,6 +237,7 @@ export const SEED_ANOMALIES: Anomaly[] = [
     explanation:
       "The physician group that treated Sofia in the ER billed this out-of-network, but federal surprise-billing protections require emergency care to be covered at in-network rates. This charge is very likely not something you owe.",
     suggestedAction: "draft_appeal_email",
+    createdAt: "2026-08-10T14:00:00.000Z",
   },
 ];
 
@@ -343,18 +349,21 @@ export const SEED_BILLS: Bill[] = [
     anomalyId: "anomaly-maria-balance-bill",
     status: "flagged",
     claimId: "claim-maria-1",
+    createdAt: "2026-08-23T10:00:00.000Z",
   },
   {
     id: "bill-sofia-er",
     personId: "person-sofia",
     chargeIds: ["charge-sofia-er"],
     status: "paid",
+    createdAt: "2026-08-05T09:00:00.000Z",
   },
   {
     id: "bill-david-checkup",
     personId: "person-david",
     chargeIds: ["charge-david-checkup"],
     status: "pending",
+    createdAt: "2026-06-18T09:00:00.000Z",
   },
   {
     id: "bill-david-coding",
@@ -363,6 +372,7 @@ export const SEED_BILLS: Bill[] = [
     anomalyId: "anomaly-david-coding-mismatch",
     status: "flagged",
     claimId: "claim-david-coding",
+    createdAt: "2026-09-04T09:00:00.000Z",
   },
   {
     id: "bill-sofia-er-physician",
@@ -371,6 +381,7 @@ export const SEED_BILLS: Bill[] = [
     anomalyId: "anomaly-sofia-oon-surprise",
     status: "flagged",
     claimId: "claim-sofia-er-physician",
+    createdAt: "2026-08-11T09:00:00.000Z",
   },
 ];
 
@@ -384,6 +395,7 @@ export const SEED_DOCUMENTS: WestyDocument[] = [
     extracted: { diagnosis: "Distal radius fracture, left arm", facility: "Riverside ER" },
     explanation:
       "This is the ER discharge summary from Sofia's visit on August 2nd — it confirms the fracture diagnosis and the initial splint placement.",
+    createdAt: "2026-08-02T18:00:00.000Z",
   },
   {
     id: "doc-sofia-xray",
@@ -392,6 +404,7 @@ export const SEED_DOCUMENTS: WestyDocument[] = [
     type: "other",
     status: "extracted",
     extracted: { facility: "Riverside Orthopedics" },
+    createdAt: "2026-08-09T16:00:00.000Z",
   },
   {
     id: "doc-david-labs",
@@ -399,6 +412,7 @@ export const SEED_DOCUMENTS: WestyDocument[] = [
     episodeId: "episode-david-diabetes",
     type: "other",
     status: "processing",
+    createdAt: "2026-09-09T08:30:00.000Z",
   },
 ];
 
@@ -486,6 +500,7 @@ export const SEED_TASKS: Task[] = [
     source: "system",
     episodeId: "episode-sofia-arm",
     due: "2026-09-18",
+    createdAt: "2026-09-08T09:00:00.000Z",
   },
   {
     id: "task-maria-dispute",
@@ -493,6 +508,55 @@ export const SEED_TASKS: Task[] = [
     title: "Review and respond to flagged bill",
     status: "open",
     source: "bill",
+    createdAt: "2026-08-23T10:05:00.000Z",
+  },
+];
+
+/**
+ * Household-level, plausibly-forgotten benefit — the demo's "you have an
+ * unused benefit expiring soon" moment. remainingValue < totalValue because
+ * $50 was auto-applied toward Sofia's pediatric wellness copay earlier this
+ * year; the family never noticed the reimbursement program exists at all,
+ * let alone that $250 of it is still sitting there with a hard expiry.
+ */
+export const SEED_BENEFITS: Benefit[] = [
+  {
+    id: "benefit-ramirez-wellness",
+    householdId: "hh-ramirez",
+    name: "Wellness & Fitness Reimbursement",
+    description:
+      "Your plan includes up to $300/year in reimbursement for gym memberships, fitness classes, or wellness apps. $50 was automatically applied toward Sofia's pediatric wellness visit copay in March — the rest has gone unclaimed.",
+    category: "wellness",
+    unit: "usd",
+    totalValue: 300,
+    remainingValue: 250,
+    expiresOn: "2026-11-15",
+    status: "available",
+    createdAt: "2026-01-01T00:00:00.000Z",
+  },
+];
+
+/**
+ * Exactly two, both "suggested" — the demo's two Boost moments: prepping for
+ * Sofia's already-scheduled cast removal, and surfacing the wellness benefit
+ * above before it expires. Both routed to Maria as coordinator.
+ */
+export const SEED_BOOSTS: Boost[] = [
+  {
+    id: "boost-sofia-cast-removal-prep",
+    personId: "person-maria",
+    kind: "appointment_prep",
+    appointmentId: "appt-sofia-cast-removal",
+    status: "suggested",
+    createdAt: "2026-09-12T09:00:00.000Z",
+  },
+  {
+    id: "boost-ramirez-wellness-benefit",
+    personId: "person-maria",
+    kind: "benefits_exploration",
+    benefitId: "benefit-ramirez-wellness",
+    status: "suggested",
+    createdAt: "2026-09-10T08:05:00.000Z",
   },
 ];
 
@@ -537,6 +601,8 @@ export function getSeedData() {
     careTeam: SEED_CARE_TEAM,
     connectors: SEED_CONNECTORS,
     tasks: SEED_TASKS,
+    benefits: SEED_BENEFITS,
+    boosts: SEED_BOOSTS,
     chatThread: SEED_CHAT_THREAD,
   };
 }

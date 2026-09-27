@@ -17,6 +17,8 @@ import type {
   ChatMessage,
   PersonalDataExport,
   Task,
+  Boost,
+  Benefit,
 } from "@westy/shared";
 import type {
   WestyClient,
@@ -31,6 +33,7 @@ import type {
 } from "@westy/shared/client";
 import { createInitialState, type MockState } from "./state";
 import { delay } from "./delay";
+import { PROVIDER_DIRECTORY } from "./seed";
 
 /**
  * The one scripted failure in the demo: no provider_portal integration
@@ -284,6 +287,7 @@ export class MockWestyClient implements WestyClient {
       personId: input.personId,
       type: input.type,
       status: "uploaded",
+      createdAt: new Date().toISOString(),
     };
     this.state.documents.push(document);
     this.resolveDocumentInBackground(document.id);
@@ -501,6 +505,53 @@ export class MockWestyClient implements WestyClient {
     const task = this.state.tasks.find((t) => t.id === taskId) ?? notFound("Task", taskId);
     task.status = "complete";
     return task;
+  }
+
+  // ── Boosts & benefits ────────────────────────────────────────────────
+  async listBoosts(personId: string): Promise<Boost[]> {
+    await delay(200);
+    return this.state.boosts
+      .filter((b) => b.personId === personId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  async acceptBoost(boostId: string): Promise<Boost> {
+    await delay(250);
+    const boost = this.state.boosts.find((b) => b.id === boostId) ?? notFound("Boost", boostId);
+    boost.status = "accepted";
+    this.resolveBoostInBackground(boostId);
+    return boost;
+  }
+
+  /** Fires after a realistic delay so the UI can show genuine "working…" state before the Boost's agentic work resolves. */
+  private resolveBoostInBackground(boostId: string): void {
+    delay(2200).then(() => {
+      const boost = this.state.boosts.find((b) => b.id === boostId);
+      if (!boost) return;
+      if (boost.kind === "appointment_prep") {
+        const appointment = this.state.appointments.find((a) => a.id === boost.appointmentId);
+        const provider = appointment ? PROVIDER_DIRECTORY[appointment.providerId] ?? "the provider" : "the provider";
+        const reason = appointment?.reason ?? "the visit";
+        boost.prepNotes = `Ahead of the "${reason}" appointment at ${provider}: bring a photo ID and insurance card, and jot down any questions or concerns from the last few weeks so they don't slip your mind in the room. It's a good moment to ask what to watch for afterward and when to follow up. If anything comes up before then, you can call ${provider} directly rather than waiting.`;
+      }
+      boost.status = "completed";
+    });
+  }
+
+  async dismissBoost(boostId: string): Promise<void> {
+    await delay(200);
+    const boost = this.state.boosts.find((b) => b.id === boostId) ?? notFound("Boost", boostId);
+    boost.status = "dismissed";
+  }
+
+  async listBenefits(householdId: string): Promise<Benefit[]> {
+    await delay(200);
+    return this.state.benefits.filter((b) => b.householdId === householdId);
+  }
+
+  async getBenefit(benefitId: string): Promise<Benefit> {
+    await delay(150);
+    return this.state.benefits.find((b) => b.id === benefitId) ?? notFound("Benefit", benefitId);
   }
 
   // ── Ask Westy ────────────────────────────────────────────────────────
