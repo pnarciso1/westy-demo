@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Card, CardKicker, CardTitle, CardBody, Tag, Button, Skeleton, AiSurface } from "@westy/shared/ui";
-import type { Anomaly, Bill, CareTeamMember, Charge } from "@westy/shared";
+import type { Anomaly, AnomalyNextStep, Bill, CareTeamMember, Charge } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
 import { UserAvatar } from "@/components/UserAvatar";
 import { mockWestyClient, PROVIDER_DIRECTORY } from "@/lib/mock";
@@ -31,12 +31,11 @@ const SEVERITY_LABEL: Record<Anomaly["severity"], string> = {
   action_needed: "Action needed",
 };
 
-const SUGGESTION_COPY: Record<NonNullable<Anomaly["suggestedAction"]>, string> = {
-  dispute_with_payer: "My suggestion: dispute this with your insurer — the amount above your plan's benefit likely isn't something you owe.",
-  pay_now: "My suggestion: this looks correct as billed — you can pay it now.",
-  draft_appeal_email: "My suggestion: draft an appeal to the insurer. I can put the letter together — you'll review it before anything is sent.",
-  call_provider: "My suggestion: call the provider's billing office directly to sort this out.",
-};
+// "Booked by Westy" on the Dashboard uses the same outline/neutral split to
+// attribute an action to Westy vs. the person — reused here rather than
+// inventing new owner-indicator styling.
+const OWNER_LABEL: Record<AnomalyNextStep["owner"], string> = { westy: "Westy", user: "You" };
+const OWNER_TAG_VARIANT: Record<AnomalyNextStep["owner"], "outline" | "neutral"> = { westy: "outline", user: "neutral" };
 
 export default function BillDetail() {
   const params = useParams<{ id: string }>();
@@ -216,11 +215,18 @@ export default function BillDetail() {
             </div>
 
             <AiSurface>
-              <p style={{ margin: anomaly?.suggestedAction && flow.kind === "none" ? "0 0 10px" : 0 }}>
-                {anomaly ? anomaly.explanation : fallbackExplanation(bill, { billed, insurancePaid, owe })}
+              <p style={{ margin: anomaly && anomaly.nextSteps.length > 0 && flow.kind === "none" ? "0 0 10px" : 0 }}>
+                {anomaly ? anomaly.detailedExplanation : fallbackExplanation(bill, { billed, insurancePaid, owe })}
               </p>
-              {anomaly?.suggestedAction && flow.kind === "none" && (
-                <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>{SUGGESTION_COPY[anomaly.suggestedAction]}</p>
+              {anomaly && anomaly.nextSteps.length > 0 && flow.kind === "none" && (
+                <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {anomaly.nextSteps.map((step, i) => (
+                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <Tag variant={OWNER_TAG_VARIANT[step.owner]}>{OWNER_LABEL[step.owner]}</Tag>
+                      <span style={{ fontSize: 13, paddingTop: 2 }}>{step.description}</span>
+                    </li>
+                  ))}
+                </ul>
               )}
             </AiSurface>
 

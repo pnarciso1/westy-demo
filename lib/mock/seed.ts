@@ -212,6 +212,12 @@ export const SEED_ANOMALIES: Anomaly[] = [
     severity: "action_needed",
     explanation:
       "This provider billed you directly for the difference between their charge and what your plan paid. Since they're in-network, this amount likely isn't something you owe.",
+    detailedExplanation:
+      "Riverside Family Medicine is in your plan's network, which means they agreed to accept your plan's allowed amount as payment in full. Billing you directly for the $360 gap between what they charged and what your plan paid isn't something you should owe — balance-billing protections for in-network care generally prohibit it.",
+    nextSteps: [
+      { owner: "westy", description: "Flagged this charge and identified it as a likely balance-billing error." },
+      { owner: "user", description: "Review the dispute and confirm you'd like Westy to file it with your insurer." },
+    ],
     suggestedAction: "dispute_with_payer",
     createdAt: "2026-08-22T09:15:00.000Z",
   },
@@ -224,6 +230,12 @@ export const SEED_ANOMALIES: Anomaly[] = [
     severity: "review",
     explanation:
       "The billing code your endocrinologist's office submitted doesn't match the visit type, which caused your insurance to underpay this claim. This is a billing office error, not something you should pay out of pocket.",
+    detailedExplanation:
+      "The billing code submitted for David's quarterly A1C visit doesn't match a routine endocrinology follow-up, which caused your insurer to apply the wrong benefit and underpay the claim. This is a billing office error on Riverside Endocrine Associates' end, not a coverage gap in David's plan.",
+    nextSteps: [
+      { owner: "westy", description: "Compared the submitted billing code against the visit type and confirmed the mismatch." },
+      { owner: "user", description: "Call Riverside Endocrine Associates' billing office and ask them to resubmit with the correct code." },
+    ],
     suggestedAction: "call_provider",
     createdAt: "2026-09-03T11:00:00.000Z",
   },
@@ -236,6 +248,12 @@ export const SEED_ANOMALIES: Anomaly[] = [
     severity: "action_needed",
     explanation:
       "The physician group that treated Sofia in the ER billed this out-of-network, but federal surprise-billing protections require emergency care to be covered at in-network rates. This charge is very likely not something you owe.",
+    detailedExplanation:
+      "The attending physician group at Riverside ER isn't in Sofia's plan network, but the No Surprises Act requires emergency care to be billed at in-network cost-sharing rates regardless of which physician treats the patient. This $680 charge should be reprocessed at Sofia's in-network rate.",
+    nextSteps: [
+      { owner: "westy", description: "Drafted an appeal citing the No Surprises Act's emergency-care protections." },
+      { owner: "user", description: "Review the drafted appeal and send it to your insurer." },
+    ],
     suggestedAction: "draft_appeal_email",
     createdAt: "2026-08-10T14:00:00.000Z",
   },
