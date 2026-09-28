@@ -5,10 +5,13 @@ import { Button, Dialog, Field, TextInput, Tag, AiSurface, SectionLabel, Skeleto
 import type { Connector, Person, PersonalDataExport } from "@westy/shared";
 import { AppNav } from "@/components/AppNav";
 import { UserAvatar } from "@/components/UserAvatar";
+import { InsuranceConnectDialog } from "@/components/InsuranceConnectDialog";
 import { mockWestyClient } from "@/lib/mock";
 import { formatShortDate } from "@/lib/bills";
 
 type ConnectorCategory = Extract<Connector["type"], "payer" | "phr_ehr" | "provider_portal" | "hsa_fsa_card">;
+// Insurance goes through InsuranceConnectDialog instead of the catalog picker.
+type CatalogCategory = Exclude<ConnectorCategory, "payer">;
 type ConnectorWithOwner = Connector & { owner: Person };
 type CatalogOption = { id: string; name: string; sub: string };
 
@@ -23,18 +26,7 @@ const CATEGORY_LABEL: Record<ConnectorCategory, string> = {
 
 // Presentational catalog only — WestyClient has no vendor directory to serve,
 // so this is invented, reasonable-looking data for the picker, not real data.
-const CATALOG: Record<ConnectorCategory, { placeholder: string; options: CatalogOption[] }> = {
-  payer: {
-    placeholder: "Search insurers…",
-    options: [
-      { id: "uhc", name: "UnitedHealthcare", sub: "Medical, dental, vision" },
-      { id: "bcbs", name: "Blue Cross Blue Shield", sub: "Choose your state plan after sign-in" },
-      { id: "humana", name: "Humana", sub: "Medical, Medicare" },
-      { id: "aetna", name: "Aetna", sub: "Medical, dental" },
-      { id: "cigna", name: "Cigna Healthcare", sub: "Medical, dental" },
-      { id: "kaiser", name: "Kaiser Permanente", sub: "Integrated plan & records" },
-    ],
-  },
+const CATALOG: Record<CatalogCategory, { placeholder: string; options: CatalogOption[] }> = {
   phr_ehr: {
     placeholder: "Search patient portals…",
     options: [
@@ -86,7 +78,8 @@ export default function Connections() {
   const [connectors, setConnectors] = useState<ConnectorWithOwner[]>([]);
   const pollsRef = useRef<Record<string, ReturnType<typeof setInterval>>>({});
 
-  const [pickerCategory, setPickerCategory] = useState<ConnectorCategory | null>(null);
+  const [pickerCategory, setPickerCategory] = useState<CatalogCategory | null>(null);
+  const [insuranceDialogOpen, setInsuranceDialogOpen] = useState(false);
   const [pickerQuery, setPickerQuery] = useState("");
 
   const [exportRecord, setExportRecord] = useState<PersonalDataExport | null>(null);
@@ -130,18 +123,22 @@ export default function Connections() {
     pollsRef.current[connectorId] = interval;
   }
 
-  async function handlePick(category: ConnectorCategory, option: CatalogOption) {
+  async function connect(category: ConnectorCategory, vendor: string) {
     const owner = members?.find((m) => m.id === coordinatorPersonId);
     if (!owner) return;
     const connector = await mockWestyClient.initiateConnector({
       ownerPersonId: coordinatorPersonId,
       type: category,
-      vendor: option.name,
+      vendor,
     });
     setConnectors((prev) => [...prev, { ...connector, owner }]);
+    pollConnector(connector.id);
+  }
+
+  async function handlePick(category: CatalogCategory, option: CatalogOption) {
     setPickerCategory(null);
     setPickerQuery("");
-    pollConnector(connector.id);
+    await connect(category, option.name);
   }
 
   async function handleReconnect(connectorId: string) {
@@ -241,7 +238,12 @@ export default function Connections() {
                 <section key={category}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                     <SectionLabel>{CATEGORY_LABEL[category]}</SectionLabel>
-                    <Button variant="ghost" onClick={() => setPickerCategory(category)}>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        category === "payer" ? setInsuranceDialogOpen(true) : setPickerCategory(category)
+                      }
+                    >
                       + Add connection
                     </Button>
                   </div>
@@ -453,6 +455,16 @@ export default function Connections() {
           </div>
         )}
       </Dialog>
+
+      <InsuranceConnectDialog
+        open={insuranceDialogOpen}
+        onDismiss={() => setInsuranceDialogOpen(false)}
+        onConfirm={(vendor) => {
+          setInsuranceDialogOpen(false);
+          connect("payer", vendor);
+        }}
+        alreadyConnected={(vendor) => connectors.some((c) => c.type === "payer" && c.vendor === vendor)}
+      />
     </>
   );
 }

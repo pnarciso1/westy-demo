@@ -31,6 +31,7 @@ import {
 } from "@westy/shared/ui";
 import type { Document as WestyDocument, OnboardingSession, OnboardingStep } from "@westy/shared";
 import { mockWestyClient } from "@/lib/mock";
+import { InsuranceConnectDialog } from "@/components/InsuranceConnectDialog";
 
 type ConnectorKind = "payer" | "hsa_fsa_card" | "provider_portal";
 type ConnectorState = {
@@ -166,6 +167,7 @@ export default function Onboarding() {
   });
   const [documentIds, setDocumentIds] = useState<string[]>([]);
   const providerBillRef = useRef<HTMLDivElement>(null);
+  const [insuranceDialogOpen, setInsuranceDialogOpen] = useState(false);
 
   function pollConnector(kind: ConnectorKind, id: string) {
     const interval = setInterval(async () => {
@@ -179,12 +181,12 @@ export default function Onboarding() {
     intervalsRef.current.push(interval);
   }
 
-  async function handleConnect(kind: ConnectorKind) {
+  async function handleConnect(kind: ConnectorKind, vendor = CONNECTOR_INFO[kind].vendor) {
     if (!session) return;
     const connector = await mockWestyClient.initiateConnector({
       ownerPersonId: session.userId,
       type: kind,
-      vendor: CONNECTOR_INFO[kind].vendor,
+      vendor,
     });
     setConnectors((prev) => ({ ...prev, [kind]: { id: connector.id, status: connector.status } }));
     setConnectorIds((prev) => [...prev, connector.id]);
@@ -384,7 +386,10 @@ export default function Onboarding() {
                       <CardBody>{info.description}</CardBody>
                       {!state && (
                         <div>
-                          <Button variant="secondary" onClick={() => handleConnect(kind)}>
+                          <Button
+                            variant="secondary"
+                            onClick={() => (kind === "payer" ? setInsuranceDialogOpen(true) : handleConnect(kind))}
+                          >
                             Connect {info.title}
                           </Button>
                         </div>
@@ -474,6 +479,15 @@ export default function Onboarding() {
           </Card>
         )}
       </main>
+
+      <InsuranceConnectDialog
+        open={insuranceDialogOpen}
+        onDismiss={() => setInsuranceDialogOpen(false)}
+        onConfirm={(vendor) => {
+          setInsuranceDialogOpen(false);
+          handleConnect("payer", vendor);
+        }}
+      />
     </>
   );
 }
